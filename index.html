@@ -1,165 +1,2333 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Living Bodygraph - Lance's Design</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Enneagram</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --ink: #1a1612;
+    --parchment: #f7f3ed;
+    --warm-mid: #e8e0d4;
+    --accent: #8b4a2f;
+    --accent-soft: #c4845f;
+    --gold: #b8860b;
+    --gold-light: #d4a843;
+    --muted: #7a6e63;
+    --deep: #2c1f14;
+    --type-1: #5c6b4e; --type-2: #9b4a5a; --type-3: #c47c2e;
+    --type-4: #5a4a7a; --type-5: #2e5e8e; --type-6: #3d6b6b;
+    --type-7: #c4632e; --type-8: #7a2e2e; --type-9: #4a6b4a;
+    --fivew4: #4a3a6b;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--parchment);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  .app-header {
+    background: var(--deep);
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(184,134,11,0.3);
+  }
+
+  .header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    gap: 0;
+  }
+
+  .brand {
+    padding: 18px 32px 18px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .brand-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--parchment);
+    letter-spacing: 0.08em;
+  }
+
+  .brand-sub {
+    font-size: 10px;
+    font-weight: 300;
+    color: var(--gold-light);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .tabs {
+    display: flex;
+    align-items: stretch;
+  }
+
+  .tab-btn {
+    padding: 0 32px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(247,243,237,0.5);
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .tab-btn.active {
+    color: var(--gold-light);
+    border-bottom-color: var(--gold-light);
+  }
+
+  .tab-btn:hover:not(.active) {
+    color: rgba(247,243,237,0.8);
+  }
+
+  /* ── MAIN LAYOUT ── */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ── LEARN TAB ── */
+  .learn-layout {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 48px 32px;
+  }
+
+  .learn-header {
+    text-align: center;
+    margin-bottom: 56px;
+  }
+
+  .learn-header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 48px;
+    font-weight: 300;
+    color: var(--deep);
+    margin-bottom: 12px;
+  }
+
+  .learn-header p {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--muted);
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.7;
+    letter-spacing: 0.02em;
+  }
+
+  /* ── ENNEAGRAM DIAGRAM ── */
+  .diagram-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 56px;
+    position: relative;
+    padding: 0 8px;
+  }
+
+  .enneagram-svg {
+    width: 520px;
+    height: 520px;
+    max-width: 100%;
+    filter: drop-shadow(0 8px 32px rgba(44,31,20,0.15));
+    overflow: visible;
+  }
+
+  .type-node {
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .type-node:hover .node-circle {
+    r: 30;
+  }
+
+  .type-node:hover .node-bg {
+    opacity: 0.15;
+  }
+
+  .node-circle {
+    transition: r 0.2s ease;
+  }
+
+  /* ── TYPE DETAIL PANEL ── */
+  .type-detail {
+    display: none;
+    animation: fadeUp 0.35s ease;
+  }
+
+  .type-detail.visible {
+    display: block;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .detail-card {
+    background: white;
+    border-radius: 2px;
+    overflow: hidden;
+    box-shadow: 0 4px 40px rgba(44,31,20,0.1);
+  }
+
+  .detail-header {
+    padding: 40px 48px 32px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .detail-header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    opacity: 0.06;
+    background: radial-gradient(ellipse at top left, currentColor 0%, transparent 60%);
+  }
+
+  .detail-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 96px;
+    font-weight: 300;
+    line-height: 1;
+    opacity: 0.08;
+    position: absolute;
+    top: 16px;
+    right: 32px;
+    color: var(--ink);
+  }
+
+  .detail-eyebrow {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .detail-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 40px;
+    font-weight: 400;
+    margin-bottom: 8px;
+    line-height: 1.1;
+  }
+
+  .detail-tagline {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 24px;
+    letter-spacing: 0.01em;
+  }
+
+  .detail-meta {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .meta-pill {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 20px;
+    background: rgba(0,0,0,0.06);
+    color: var(--ink);
+  }
+
+  .detail-body {
+    padding: 40px 48px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px 48px;
+  }
+
+  .detail-section {
+    grid-column: span 2;
+  }
+
+  .detail-section.half {
+    grid-column: span 1;
+  }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--warm-mid);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-label::before {
+    content: '';
+    width: 24px;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.4;
+  }
+
+  .section-text {
+    font-size: 16px;
+    line-height: 1.85;
+    color: #3a3028;
+    font-weight: 300;
+  }
+
+  .story-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 21px;
+    line-height: 1.75;
+    color: var(--deep);
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  .arrow-row {
+    display: flex;
+    gap: 16px;
+    margin-top: 4px;
+  }
+
+  .arrow-chip {
+    flex: 1;
+    padding: 12px 16px;
+    border-radius: 2px;
+    border-left: 3px solid;
+    font-size: 15px;
+    font-weight: 300;
+    line-height: 1.5;
+  }
+
+  .arrow-chip .chip-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    opacity: 0.7;
+  }
+
+  .arrow-chip.stress {
+    background: #fff4f0;
+    border-color: #c47c5a;
+    color: #6b3a20;
+  }
+
+  .arrow-chip.growth {
+    background: #f0f5f0;
+    border-color: #5a8a5a;
+    color: #2a4a2a;
+  }
+
+  .strengths-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .strength-tag {
+    font-size: 13px;
+    padding: 6px 14px;
+    border-radius: 2px;
+    background: #f0f4f0;
+    color: #3a5a3a;
+    font-weight: 400;
+    border: 1px solid #d0e0d0;
+  }
+
+  .challenge-tag {
+    font-size: 13px;
+    padding: 6px 14px;
+    border-radius: 2px;
+    background: #fdf0ec;
+    color: #6b3a28;
+    font-weight: 400;
+    border: 1px solid #e8c8bc;
+  }
+
+  .wings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 4px;
+  }
+
+  .wing-card {
+    padding: 16px;
+    background: var(--parchment);
+    border-radius: 2px;
+    border: 1px solid var(--warm-mid);
+  }
+
+  .wing-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    color: var(--accent);
+  }
+
+  .wing-text {
+    font-size: 15px;
+    line-height: 1.7;
+    font-weight: 300;
+    color: #3a3028;
+  }
+
+  .close-detail {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    background: none;
+    border: 1px solid var(--warm-mid);
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    font-size: 18px;
+    transition: all 0.2s;
+    z-index: 2;
+  }
+
+  .close-detail:hover {
+    background: var(--warm-mid);
+    color: var(--ink);
+  }
+
+  /* ── 5w4 PERSONAL TAB ── */
+  .personal-layout {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 48px 32px;
+  }
+
+  .personal-hero {
+    background: var(--deep);
+    border-radius: 2px;
+    padding: 56px 64px;
+    margin-bottom: 48px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .personal-hero::before {
+    content: '5w4';
+    position: absolute;
+    right: 48px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 160px;
+    font-weight: 300;
+    color: rgba(184,134,11,0.12);
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  .hero-eyebrow {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    margin-bottom: 12px;
+  }
+
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 52px;
+    font-weight: 300;
+    color: var(--parchment);
+    margin-bottom: 8px;
+    line-height: 1.1;
+  }
+
+  .hero-subtitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 300;
+    font-style: italic;
+    color: rgba(247,243,237,0.6);
+    margin-bottom: 28px;
+  }
+
+  .hero-tags {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .hero-tag {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border: 1px solid rgba(184,134,11,0.4);
+    color: var(--gold-light);
+    border-radius: 20px;
+  }
+
+  /* ── PERSONAL NAV ── */
+  .section-nav {
+    display: flex;
+    gap: 0;
+    margin-bottom: 40px;
+    border-bottom: 1px solid var(--warm-mid);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .section-nav::-webkit-scrollbar { display: none; }
+
+  .section-nav-btn {
+    padding: 12px 20px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+    transition: all 0.2s;
+    margin-bottom: -1px;
+  }
+
+  .section-nav-btn.active {
+    color: var(--fivew4);
+    border-bottom-color: var(--fivew4);
+  }
+
+  .section-nav-btn:hover:not(.active) {
+    color: var(--ink);
+  }
+
+  /* ── PERSONAL CONTENT PANELS ── */
+  .personal-panel { display: none; }
+  .personal-panel.active { display: block; animation: fadeUp 0.3s ease; }
+
+  .panel-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  .panel-grid.single { grid-template-columns: 1fr; }
+  .panel-grid.thirds { grid-template-columns: 1fr 1fr 1fr; }
+
+  .p-card {
+    background: white;
+    padding: 32px;
+    border-radius: 2px;
+    box-shadow: 0 2px 16px rgba(44,31,20,0.06);
+  }
+
+  .p-card.full { grid-column: span 2; }
+  .p-card.featured {
+    background: var(--deep);
+    color: var(--parchment);
+  }
+
+  .p-card-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--warm-mid);
+  }
+
+  .p-card.featured .p-card-label {
+    color: var(--gold-light);
+    border-bottom-color: rgba(184,134,11,0.3);
+  }
+
+  .p-card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    font-weight: 400;
+    margin-bottom: 12px;
+    line-height: 1.2;
+  }
+
+  .p-card.featured .p-card-title {
+    color: var(--parchment);
+  }
+
+  .p-card-text {
+    font-size: 16px;
+    line-height: 1.85;
+    font-weight: 300;
+    color: #3a3028;
+  }
+
+  .p-card.featured .p-card-text {
+    color: rgba(247,243,237,0.8);
+  }
+
+  .pullquote {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--fivew4);
+    border-left: 3px solid var(--fivew4);
+    padding-left: 24px;
+    margin: 24px 0;
+    line-height: 1.6;
+  }
+
+  .insight-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 4px;
+  }
+
+  .insight-list li {
+    font-size: 16px;
+    line-height: 1.75;
+    font-weight: 300;
+    color: #3a3028;
+    padding-left: 20px;
+    position: relative;
+  }
+
+  .insight-list li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--accent-soft);
+    font-weight: 300;
+  }
+
+  .reframe-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 4px;
+  }
+
+  .reframe-table tr { border-bottom: 1px solid var(--warm-mid); }
+  .reframe-table tr:last-child { border-bottom: none; }
+
+  .reframe-table td {
+    padding: 16px 16px;
+    font-size: 15px;
+    line-height: 1.65;
+    font-weight: 300;
+    vertical-align: top;
+  }
+
+  .reframe-table td:first-child {
+    color: var(--muted);
+    width: 45%;
+    font-style: italic;
+    padding-right: 24px;
+    border-right: 1px solid var(--warm-mid);
+  }
+
+  .reframe-table td:last-child {
+    color: #2a3a2a;
+    padding-left: 24px;
+    font-weight: 400;
+  }
+
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+  }
+
+  .compare-table th {
+    padding: 10px 16px;
+    text-align: left;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .compare-table th:first-child { color: var(--fivew4); background: rgba(74,58,107,0.08); }
+  .compare-table th:last-child { color: var(--muted); background: rgba(0,0,0,0.03); }
+
+  .compare-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--warm-mid);
+    line-height: 1.6;
+    font-weight: 300;
+    vertical-align: top;
+  }
+
+  .compare-table td:first-child { color: #2a1f3a; background: rgba(74,58,107,0.04); }
+  .compare-table td:last-child { color: var(--muted); }
+
+  .arrow-integration {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 8px;
+  }
+
+  .integration-card {
+    padding: 20px;
+    border-radius: 2px;
+    border-top: 3px solid;
+  }
+
+  .integration-card.growth {
+    background: #f2f7f2;
+    border-color: #5a8a5a;
+  }
+
+  .integration-card.stress {
+    background: #fdf4f0;
+    border-color: #c47c5a;
+  }
+
+  .integration-card .ic-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .integration-card.growth .ic-label { color: #3a6a3a; }
+  .integration-card.stress .ic-label { color: #8a4a2a; }
+
+  .integration-card .ic-type {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 400;
+    margin-bottom: 8px;
+  }
+
+  .integration-card.growth .ic-type { color: #2a4a2a; }
+  .integration-card.stress .ic-type { color: #6a2a0a; }
+
+  .integration-card .ic-text {
+    font-size: 13px;
+    line-height: 1.65;
+    font-weight: 300;
+  }
+
+  .time-diagram {
+    display: flex;
+    gap: 16px;
+    margin: 20px 0;
+  }
+
+  .time-block {
+    flex: 1;
+    padding: 20px;
+    border-radius: 2px;
+    text-align: center;
+  }
+
+  .time-block.now {
+    background: var(--fivew4);
+    color: white;
+  }
+
+  .time-block.notnow {
+    background: rgba(74,58,107,0.1);
+    color: var(--fivew4);
+    border: 1px dashed rgba(74,58,107,0.3);
+  }
+
+  .time-block .tb-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    opacity: 0.8;
+  }
+
+  .time-block .tb-val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 400;
+  }
+
+  .time-block .tb-sub {
+    font-size: 11px;
+    font-weight: 300;
+    margin-top: 6px;
+    opacity: 0.8;
+    line-height: 1.5;
+  }
+
+  .callout-box {
+    background: rgba(74,58,107,0.07);
+    border-left: 3px solid var(--fivew4);
+    padding: 20px 24px;
+    border-radius: 0 2px 2px 0;
+    margin: 16px 0;
+    font-size: 16px;
+    line-height: 1.75;
+    font-weight: 300;
+    color: #2a1f3a;
+    font-style: italic;
+  }
+
+  /* ── FOUNDATION SECTION ── */
+  .foundation-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+
+  .foundation-card {
+    background: white;
+    padding: 28px;
+    border-radius: 2px;
+    box-shadow: 0 2px 12px rgba(44,31,20,0.06);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border-top: 3px solid var(--warm-mid);
+  }
+
+  .foundation-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 32px rgba(44,31,20,0.1);
+    border-top-color: var(--accent);
+  }
+
+  .fc-icon {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px;
+    font-weight: 300;
+    color: var(--accent-soft);
+    margin-bottom: 12px;
+  }
+
+  .fc-title {
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+    color: var(--deep);
+  }
+
+  .fc-text {
+    font-size: 13px;
+    line-height: 1.7;
+    font-weight: 300;
+    color: var(--muted);
+  }
+
+  .foundation-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(26,22,18,0.6);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    backdrop-filter: blur(4px);
+  }
+
+  .foundation-modal-overlay.open {
+    display: flex;
+    animation: fadeIn 0.2s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .foundation-modal {
+    background: var(--parchment);
+    max-width: 680px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    border-radius: 2px;
+    box-shadow: 0 24px 80px rgba(26,22,18,0.3);
+    animation: slideUp 0.25s ease;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .modal-header {
+    padding: 36px 40px 24px;
+    border-bottom: 1px solid var(--warm-mid);
+    position: relative;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 20px; right: 20px;
+    background: none;
+    border: 1px solid var(--warm-mid);
+    cursor: pointer;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted);
+    font-size: 16px;
+    transition: all 0.2s;
+  }
+
+  .modal-close:hover { background: var(--warm-mid); color: var(--ink); }
+
+  .modal-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px;
+    font-weight: 400;
+    color: var(--deep);
+    margin-bottom: 4px;
+  }
+
+  .modal-body {
+    padding: 32px 40px 40px;
+  }
+
+  .modal-body p {
+    font-size: 16px;
+    line-height: 1.85;
+    font-weight: 300;
+    color: #3a3028;
+    margin-bottom: 20px;
+  }
+
+  .modal-body h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--deep);
+    margin: 28px 0 10px;
+  }
+
+  .modal-body .arrow-map { width: 100%; border-collapse: collapse; margin-top: 12px; }
+  .modal-body .arrow-map th { padding: 10px 14px; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; background: var(--deep); color: var(--gold-light); text-align: left; }
+  .modal-body .arrow-map td { padding: 12px 14px; font-size: 15px; border-bottom: 1px solid var(--warm-mid); font-weight: 300; }
+  .modal-body .arrow-map tr:nth-child(even) td { background: white; }
+
+  @media (max-width: 768px) {
+    /* Header */
+    .header-inner { justify-content: center; }
+    .brand { padding: 14px 20px; }
+
+    /* ── MOBILE FONT SIZES ── */
+    body { font-size: 16px; }
+
+    /* Body copy — already 16px globally, keep consistent */
+    .section-text,
+    .p-card-text,
+    .insight-list li,
+    .wing-text,
+    .callout-box,
+    .modal-body p,
+    .fc-text { font-size: 16px; line-height: 1.8; }
+
+    /* Story text */
+    .story-text { font-size: 20px; line-height: 1.75; }
+
+    /* Pull quotes */
+    .pullquote { font-size: 20px; }
+
+    /* Card titles */
+    .p-card-title { font-size: 22px; }
+
+    /* Section/card labels */
+    .p-card-label,
+    .section-label { font-size: 11px; }
+
+    /* Arrow chips */
+    .arrow-chip { font-size: 15px; }
+    .arrow-chip .chip-label { font-size: 11px; }
+
+    /* Tags */
+    .strength-tag,
+    .challenge-tag { font-size: 14px; padding: 7px 14px; }
+
+    /* Wing labels */
+    .wing-label { font-size: 12px; }
+
+    /* Tables */
+    .reframe-table td { font-size: 15px; line-height: 1.7; }
+    .compare-table { font-size: 14px; }
+    .compare-table th { font-size: 11px; }
+
+    /* Modal */
+    .modal-body p { font-size: 16px; }
+    .modal-body h3 { font-size: 21px; }
+    .modal-title { font-size: 26px; }
+
+    /* Integration cards */
+    .integration-card .ic-text { font-size: 15px; }
+    .integration-card .ic-type { font-size: 22px; }
+
+    /* Learn tab */
+    .learn-layout { padding: 28px 16px; }
+    .learn-header h1 { font-size: 32px; }
+    .learn-header p { font-size: 15px; }
+    .learn-header { margin-bottom: 32px; }
+
+    /* Foundation cards */
+    .foundation-grid { grid-template-columns: 1fr; gap: 10px; margin-bottom: 28px; }
+    .foundation-card { padding: 20px; }
+    .fc-title { font-size: 15px; }
+
+    /* Diagram */
+    .enneagram-svg { width: 100%; height: auto; max-width: 380px; }
+
+    /* Detail panel */
+    .detail-header { padding: 28px 20px 24px; }
+    .detail-number { font-size: 64px; top: 12px; right: 16px; }
+    .detail-title { font-size: 28px; }
+    .detail-tagline { font-size: 15px; }
+    .detail-body { grid-template-columns: 1fr; padding: 20px; gap: 24px; }
+    .detail-section,
+    .detail-section.half { grid-column: span 1; }
+    .wings-grid { grid-template-columns: 1fr; }
+    .arrow-row { flex-direction: column; }
+
+    /* Personal tab */
+    .personal-layout { padding: 24px 16px; }
+    .personal-hero { padding: 32px 24px; margin-bottom: 28px; }
+    .personal-hero::before { font-size: 72px; top: 16px; right: 16px; transform: none; }
+    .hero-title { font-size: 36px; }
+    .hero-subtitle { font-size: 17px; }
+    .hero-tags { gap: 8px; }
+    .hero-tag { font-size: 11px; padding: 5px 13px; }
+
+    /* Section nav */
+    .section-nav { margin-bottom: 24px; }
+    .section-nav-btn { padding: 10px 14px; font-size: 11px; }
+
+    /* Panel grids */
+    .panel-grid { grid-template-columns: 1fr; gap: 14px; }
+    .panel-grid.thirds { grid-template-columns: 1fr; }
+    .p-card.full { grid-column: span 1; }
+    .p-card { padding: 22px; }
+    .p-card.featured { padding: 24px; }
+
+    /* Arrows & special components */
+    .arrow-integration { grid-template-columns: 1fr; }
+    .time-diagram { flex-direction: column; gap: 10px; }
+
+    /* Modal */
+    .foundation-modal { max-height: 90vh; margin: 0 8px; }
+    .modal-header { padding: 24px 24px 16px; }
+    .modal-body { padding: 20px 24px 28px; }
+
+    /* Energy map two-col → one-col */
+    .panel-grid [style*="grid-template-columns:1fr 1fr"] { grid-template-columns: 1fr !important; }
+    /* Output problem three-col → one-col */
+    .panel-grid [style*="grid-template-columns:repeat(3"] { grid-template-columns: 1fr !important; }
+  }
+
+  @media (max-width: 420px) {
+    .enneagram-svg { max-width: 320px; }
+    .hero-title { font-size: 30px; }
+    .detail-title { font-size: 24px; }
+    .story-text { font-size: 18px; }
+    .section-text,
+    .p-card-text,
+    .insight-list li { font-size: 15px; }
+  }
+
+  /* ── CARD ENTRANCE ANIMATIONS ── */
+  .animate-card {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .animate-card.in-view {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── MOBILE BOTTOM NAV ── */
+  .mobile-nav {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--deep);
+    border-top: 1px solid rgba(184,134,11,0.25);
+    z-index: 150;
+    padding: 0;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .mobile-nav-inner {
+    display: flex;
+    align-items: stretch;
+  }
+
+  .mobile-nav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 10px 8px 11px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: rgba(247,243,237,0.45);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 56px;
+  }
+
+  .mobile-nav-btn.active { color: var(--gold-light); }
+
+  .mobile-nav-btn svg {
+    width: 20px; height: 20px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex-shrink: 0;
+  }
+
+  /* Swipe indicator pill on active tab */
+  .mobile-nav-btn.active::after {
+    content: '';
+    display: block;
+    width: 20px; height: 2px;
+    background: var(--gold-light);
+    border-radius: 2px;
+    margin-top: 2px;
+  }
+
+  /* ── SECTION PROGRESS BAR (personal tab) ── */
+  .section-progress {
+    height: 2px;
+    background: var(--warm-mid);
+    margin-bottom: -1px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .section-progress-fill {
+    height: 100%;
+    background: var(--fivew4);
+    transition: width 0.35s ease;
+    border-radius: 0 2px 2px 0;
+  }
+
+  /* ── SELECTED NODE RING on diagram ── */
+  .node-selected-ring {
+    fill: none;
+    stroke-width: 2.5;
+    stroke-dasharray: 4 3;
+    opacity: 0;
+    transition: opacity 0.3s;
+    animation: spin 12s linear infinite;
+    transform-origin: center;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* ── SCROLL-TO-TOP ── */
+  .scroll-top {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 40px; height: 40px;
+    background: var(--deep);
+    border: 1px solid rgba(184,134,11,0.3);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s, transform 0.3s;
+    transform: translateY(8px);
+    z-index: 140;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .scroll-top.visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  .scroll-top svg {
+    width: 16px; height: 16px;
+    stroke: var(--gold-light);
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* ── MOBILE: hide desktop header tabs, show bottom nav ── */
+  @media (max-width: 768px) {
+    .tabs { display: none; }
+    .mobile-nav { display: block; }
+    /* Pad main content above mobile nav */
+    main { padding-bottom: calc(56px + env(safe-area-inset-bottom)); }
+    /* Scroll-to-top sits above mobile nav */
+    .scroll-top { bottom: calc(68px + env(safe-area-inset-bottom)); }
+    /* Header brand centred when tabs hidden */
+    .header-inner { justify-content: center; }
+    .brand { padding: 14px 20px; }
+  }
+
+  /* ── NODE HOVER TOOLTIP ── */
+  .node-tooltip {
+    position: absolute;
+    background: var(--deep);
+    color: var(--parchment);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    padding: 5px 10px;
+    border-radius: 3px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    white-space: nowrap;
+    z-index: 50;
+    border: 1px solid rgba(184,134,11,0.3);
+  }
+
+  .diagram-container { position: relative; }
+</style>
 </head>
 <body>
-    <!-- Geometric background -->
-    <div class="geometric-bg">
-        <div class="geo-layer" id="geo-layer-1"></div>
-        <div class="geo-layer" id="geo-layer-2"></div>
+
+<header class="app-header">
+  <div class="header-inner">
+    <div class="brand">
+      <span class="brand-title">The Enneagram</span>
+      <span class="brand-sub">A System of Nine</span>
+    </div>
+    <nav class="tabs">
+      <button class="tab-btn active" onclick="switchTab('learn', this)">Learn</button>
+      <button class="tab-btn" onclick="switchTab('personal', this)">My Type: 5w4</button>
+    </nav>
+  </div>
+</header>
+
+<!-- Mobile bottom nav -->
+<nav class="mobile-nav" id="mobile-nav">
+  <div class="mobile-nav-inner">
+    <button class="mobile-nav-btn active" id="mob-learn" onclick="switchTab('learn', this)" aria-label="Learn">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="3" x2="12" y2="21"/><path d="M3 12h18M5.6 7h12.8M5.6 17h12.8"/></svg>
+      Learn
+    </button>
+    <button class="mobile-nav-btn" id="mob-personal" onclick="switchTab('personal', this)" aria-label="My Type">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      My 5w4
+    </button>
+  </div>
+</nav>
+
+<!-- Scroll to top -->
+<button class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Scroll to top">
+  <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<main>
+
+<!-- ════════════════════════════════
+     LEARN TAB
+════════════════════════════════ -->
+<div id="view-learn" class="view active">
+  <div class="learn-layout">
+
+    <div class="learn-header">
+      <h1>The Nine Types</h1>
+      <p>Each type represents a distinct way of moving through the world — organized not by what you do, but by why. Select any type to explore its story.</p>
     </div>
 
-    <canvas id="fireflies"></canvas>
-
-    <header>
-        <h1>The Living Bodygraph</h1>
-        <p class="subtitle">Lance's Design • Manifesting Generator 3/5 • The Sphinx Cross</p>
-        <p class="instruction">Click the energy centers or channels below to explore your design in depth</p>
-    </header>
-
-    <div class="bodygraph-container">
-        <div class="centers-grid">
-            <!-- Head -->
-            <a href="center-head.html" class="center-card undefined-center" style="--center-color: #9c27b0;">
-                <div class="center-icon"></div>
-                <div class="center-info">
-                    <h3>Head Center</h3>
-                    <p class="center-status">Undefined</p>
-                    <p class="center-gates">1 Gate: 61</p>
-                </div>
-            </a>
-
-            <!-- Ajna -->
-            <a href="center-ajna.html" class="center-card defined-center" style="--center-color: #4caf50;">
-                <div class="center-icon"></div>
-                <div class="center-info">
-                    <h3>Ajna Mind</h3>
-                    <p class="center-status">Defined</p>
-                    <p class="center-gates">2 Gates: 11, 43</p>
-                </div>
-            </a>
-
-            <!-- Throat -->
-            <a href="center-throat.html" class="center-card defined-center" style="--center-color: #ff9800;">
-                <div class="center-icon"></div>
-                <div class="center-info">
-                    <h3>Throat Gateway</h3>
-                    <p class="center-status">Defined</p>
-                    <p class="center-gates">3 Gates: 8, 23, 62</p>
-                </div>
-            </a>
-
-            <!-- G-Center -->
-            <a href="center-identity.html" class="center-card defined-center" style="--center-color: #e91e63;">
-                <div class="center-icon"></div>
-                <div class="center-info">
-                    <h3>G-Center (Self)</h3>
-                    <p class="center-status">Defined</p>
-                    <p class="center-gates">6 Gates: 1, 2, 7, 10, 13, 25</p>
-                </div>
-            </a>
-
-            <!-- Heart/Will -->
-            <a href="center-heart.html" class="center-card undefined-center" style="--center-color: #f44336;">
-                <div class="center-icon"></div>
-                <div class="center-info">
-                    <h3>Heart/Will</h3>
-                    <p class="center-status">Undefined</p>
-                    <p class="center-gates">1 Gate: 26</p>
-                </div>
-            </a>
-
-            <!-- Sacral -->
-            <a href="center-sacral.html" class="center-card defined-center" style="--center-color: #ff5722;">
-                <div class="center-icon"></div>
-                <div class="center-info">
-                    <h3>Sacral Engine</h3>
-                    <p class="center-status">Defined</p>
-                    <p class="center-gates">3 Gates: 5, 14, 34</p>
-                </div>
-            </a>
-
-            <!-- Spleen -->
-            <a href="center-spleen.html" class="center-card defined-center" style="--center-color: #009688;">
-                <div class="center-icon"></div>
-                <div class="center-info">
-                    <h3>Spleen Instinct</h3>
-                    <p class="center-status">Defined</p>
-                    <p class="center-gates">1 Gate: 28</p>
-                </div>
-            </a>
-
-            <!-- Solar Plexus -->
-            <a href="center-solar.html" class="center-card undefined-center" style="--center-color: #2196f3;">
-                <div class="center-icon"></div>
-                <div class="center-info">
-                    <h3>Solar Plexus</h3>
-                    <p class="center-status">Undefined</p>
-                    <p class="center-gates">0 Gates</p>
-                </div>
-            </a>
-
-            <!-- Root -->
-            <a href="center-root.html" class="center-card defined-center" style="--center-color: #795548;">
-                <div class="center-icon"></div>
-                <div class="center-info">
-                    <h3>Root Pressure</h3>
-                    <p class="center-status">Defined</p>
-                    <p class="center-gates">3 Gates: 38, 41, 60</p>
-                </div>
-            </a>
-        </div>
+    <!-- FOUNDATION CARDS -->
+    <div class="foundation-grid">
+      <div class="foundation-card" onclick="openFoundation('centers')">
+        <div class="fc-icon">△</div>
+        <div class="fc-title">Three Centers of Intelligence</div>
+        <div class="fc-text">Gut, Heart, and Head — the triads that reveal how each type processes reality.</div>
+      </div>
+      <div class="foundation-card" onclick="openFoundation('arrows')">
+        <div class="fc-icon">→</div>
+        <div class="fc-title">The Arrows</div>
+        <div class="fc-text">How each type shifts under stress and in growth — the lines that connect the system.</div>
+      </div>
+      <div class="foundation-card" onclick="openFoundation('wings')">
+        <div class="fc-icon">◇</div>
+        <div class="fc-title">Wings</div>
+        <div class="fc-text">The adjacent types that flavor and modify each core type's expression.</div>
+      </div>
     </div>
 
-    <!-- Channels Section -->
-    <section class="channels-section">
-        <h2>The Channels That Connect You</h2>
-        <p class="section-intro">Each channel connects two centers and creates a specific theme in your life</p>
-        
-        <div class="channels-grid">
-            <a href="channel-43-23.html" class="channel-card">
-                <h3>43-23 Structuring</h3>
-                <p>Your Genius Voice - Ajna to Throat</p>
-                <span class="explore-arrow">→ Explore 5 Layers Deep</span>
-            </a>
+    <!-- ENNEAGRAM DIAGRAM -->
+    <div class="diagram-container">
+      <div class="node-tooltip" id="node-tooltip"></div>
+      <svg class="enneagram-svg" viewBox="-10 0 540 530" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="260" cy="260" r="200" fill="rgba(247,243,237,0.5)" stroke="#d4c8b8" stroke-width="1" opacity="0.6"/>
+        <polygon points="433.2,360 86.8,360 260,60" fill="none" stroke="#c4b89a" stroke-width="1.2" opacity="0.45"/>
+        <polyline points="388.6,106.8 328.4,447.9 457,225.3 131.4,106.8 191.6,447.9 63,225.3 388.6,106.8" fill="none" stroke="#c4b89a" stroke-width="1.2" opacity="0.45"/>
 
-            <a href="channel-34-10.html" class="channel-card">
-                <h3>34-10 Exploration</h3>
-                <p>Your Power Source - Sacral to G-Center</p>
-                <span class="explore-arrow">→ Explore 5 Layers Deep</span>
-            </a>
+        <g class="type-node" onclick="showType(9)" data-type="9" data-name="Peacemaker">
+          <circle id="ring-9" class="node-selected-ring" cx="260" cy="60" r="34" stroke="#4a6b4a"/>
+          <circle cx="260" cy="60" r="42" fill="#4a6b4a" opacity="0.1"/>
+          <circle class="node-circle" cx="260" cy="60" r="26" fill="#4a6b4a"/>
+          <text x="260" y="65" text-anchor="middle" fill="white" font-family="Cormorant Garamond,serif" font-size="20" font-weight="500">9</text>
+          <text x="260" y="22" text-anchor="middle" fill="#4a6b4a" font-family="DM Sans,sans-serif" font-size="13" font-weight="500" letter-spacing="1">PEACEMAKER</text>
+        </g>
+        <g class="type-node" onclick="showType(1)" data-type="1" data-name="Reformer">
+          <circle id="ring-1" class="node-selected-ring" cx="388.6" cy="106.8" r="34" stroke="#5c6b4e"/>
+          <circle cx="388.6" cy="106.8" r="42" fill="#5c6b4e" opacity="0.1"/>
+          <circle class="node-circle" cx="388.6" cy="106.8" r="26" fill="#5c6b4e"/>
+          <text x="388.6" y="111.8" text-anchor="middle" fill="white" font-family="Cormorant Garamond,serif" font-size="20" font-weight="500">1</text>
+          <text x="413" y="77.7" text-anchor="middle" fill="#5c6b4e" font-family="DM Sans,sans-serif" font-size="13" font-weight="500" letter-spacing="1">REFORMER</text>
+        </g>
+        <g class="type-node" onclick="showType(2)" data-type="2" data-name="Helper">
+          <circle id="ring-2" class="node-selected-ring" cx="457" cy="225.3" r="34" stroke="#9b4a5a"/>
+          <circle cx="457" cy="225.3" r="42" fill="#9b4a5a" opacity="0.1"/>
+          <circle class="node-circle" cx="457" cy="225.3" r="26" fill="#9b4a5a"/>
+          <text x="457" y="230.3" text-anchor="middle" fill="white" font-family="Cormorant Garamond,serif" font-size="20" font-weight="500">2</text>
+          <text x="498" y="219.7" text-anchor="middle" fill="#9b4a5a" font-family="DM Sans,sans-serif" font-size="13" font-weight="500" letter-spacing="1">HELPER</text>
+        </g>
+        <g class="type-node" onclick="showType(3)" data-type="3" data-name="Achiever">
+          <circle id="ring-3" class="node-selected-ring" cx="433.2" cy="360" r="34" stroke="#c47c2e"/>
+          <circle cx="433.2" cy="360" r="42" fill="#c47c2e" opacity="0.1"/>
+          <circle class="node-circle" cx="433.2" cy="360" r="26" fill="#c47c2e"/>
+          <text x="433.2" y="365" text-anchor="middle" fill="white" font-family="Cormorant Garamond,serif" font-size="20" font-weight="500">3</text>
+          <text x="468" y="387" text-anchor="middle" fill="#c47c2e" font-family="DM Sans,sans-serif" font-size="13" font-weight="500" letter-spacing="1">ACHIEVER</text>
+        </g>
+        <g class="type-node" onclick="showType(4)" data-type="4" data-name="Individualist">
+          <circle id="ring-4" class="node-selected-ring" cx="328.4" cy="447.9" r="34" stroke="#5a4a7a"/>
+          <circle cx="328.4" cy="447.9" r="42" fill="#5a4a7a" opacity="0.1"/>
+          <circle class="node-circle" cx="328.4" cy="447.9" r="26" fill="#5a4a7a"/>
+          <text x="328.4" y="452.9" text-anchor="middle" fill="white" font-family="Cormorant Garamond,serif" font-size="20" font-weight="500">4</text>
+          <text x="341.4" y="495.6" text-anchor="middle" fill="#5a4a7a" font-family="DM Sans,sans-serif" font-size="13" font-weight="500" letter-spacing="1">INDIVIDUALIST</text>
+        </g>
+        <g class="type-node" onclick="showType(5)" data-type="5" data-name="Investigator">
+          <circle id="ring-5" class="node-selected-ring" cx="191.6" cy="447.9" r="34" stroke="#2e5e8e"/>
+          <circle cx="191.6" cy="447.9" r="42" fill="#2e5e8e" opacity="0.1"/>
+          <circle class="node-circle" cx="191.6" cy="447.9" r="26" fill="#2e5e8e"/>
+          <text x="191.6" y="452.9" text-anchor="middle" fill="white" font-family="Cormorant Garamond,serif" font-size="20" font-weight="500">5</text>
+          <text x="178.6" y="495.6" text-anchor="middle" fill="#2e5e8e" font-family="DM Sans,sans-serif" font-size="13" font-weight="500" letter-spacing="1">INVESTIGATOR</text>
+        </g>
+        <g class="type-node" onclick="showType(6)" data-type="6" data-name="Loyalist">
+          <circle id="ring-6" class="node-selected-ring" cx="86.8" cy="360" r="34" stroke="#3d6b6b"/>
+          <circle cx="86.8" cy="360" r="42" fill="#3d6b6b" opacity="0.1"/>
+          <circle class="node-circle" cx="86.8" cy="360" r="26" fill="#3d6b6b"/>
+          <text x="86.8" y="365" text-anchor="middle" fill="white" font-family="Cormorant Garamond,serif" font-size="20" font-weight="500">6</text>
+          <text x="50" y="387" text-anchor="middle" fill="#3d6b6b" font-family="DM Sans,sans-serif" font-size="13" font-weight="500" letter-spacing="1">LOYALIST</text>
+        </g>
+        <g class="type-node" onclick="showType(7)" data-type="7" data-name="Enthusiast">
+          <circle id="ring-7" class="node-selected-ring" cx="63" cy="225.3" r="34" stroke="#c4632e"/>
+          <circle cx="63" cy="225.3" r="42" fill="#c4632e" opacity="0.1"/>
+          <circle class="node-circle" cx="63" cy="225.3" r="26" fill="#c4632e"/>
+          <text x="63" y="230.3" text-anchor="middle" fill="white" font-family="Cormorant Garamond,serif" font-size="20" font-weight="500">7</text>
+          <text x="22" y="219.7" text-anchor="middle" fill="#c4632e" font-family="DM Sans,sans-serif" font-size="13" font-weight="500" letter-spacing="1">ENTHUSIAST</text>
+        </g>
+        <g class="type-node" onclick="showType(8)" data-type="8" data-name="Challenger">
+          <circle id="ring-8" class="node-selected-ring" cx="131.4" cy="106.8" r="34" stroke="#7a2e2e"/>
+          <circle cx="131.4" cy="106.8" r="42" fill="#7a2e2e" opacity="0.1"/>
+          <circle class="node-circle" cx="131.4" cy="106.8" r="26" fill="#7a2e2e"/>
+          <text x="131.4" y="111.8" text-anchor="middle" fill="white" font-family="Cormorant Garamond,serif" font-size="20" font-weight="500">8</text>
+          <text x="107" y="77.7" text-anchor="middle" fill="#7a2e2e" font-family="DM Sans,sans-serif" font-size="13" font-weight="500" letter-spacing="1">CHALLENGER</text>
+        </g>
 
-            <a href="channel-1-8.html" class="channel-card">
-                <h3>1-8 Inspiration</h3>
-                <p>Your Role Model Energy - G-Center to Throat</p>
-                <span class="explore-arrow">→ Explore 5 Layers Deep</span>
-            </a>
+        <text x="260" y="252" text-anchor="middle" fill="#c4b89a" font-family="Cormorant Garamond,serif" font-size="16" font-style="italic" opacity="0.7">Enneagram</text>
+        <text x="260" y="270" text-anchor="middle" fill="#c4b89a" font-family="DM Sans,sans-serif" font-size="11" letter-spacing="2" opacity="0.5">OF PERSONALITY</text>
+      </svg>
+    </div>
 
-            <a href="channel-2-14.html" class="channel-card">
-                <h3>2-14 The Beat</h3>
-                <p>Your Midas Touch - G-Center to Sacral</p>
-                <span class="explore-arrow">→ Explore 5 Layers Deep</span>
-            </a>
-
-            <a href="channel-28-38.html" class="channel-card">
-                <h3>28-38 Struggle</h3>
-                <p>Your Purposeful Warrior - Spleen to Root</p>
-                <span class="explore-arrow">→ Explore 5 Layers Deep</span>
-            </a>
+    <!-- TYPE DETAIL PANEL -->
+    <div id="type-detail" class="type-detail">
+      <div class="detail-card" id="detail-card">
+        <div class="detail-header" id="detail-header">
+          <button class="close-detail" onclick="closeDetail()">×</button>
+          <div class="detail-number" id="detail-number"></div>
+          <div class="detail-eyebrow" id="detail-eyebrow"></div>
+          <div class="detail-title" id="detail-title"></div>
+          <div class="detail-tagline" id="detail-tagline"></div>
+          <div class="detail-meta" id="detail-meta"></div>
         </div>
-    </section>
+        <div class="detail-body">
+          <div class="detail-section">
+            <div class="section-label">The Primary Story</div>
+            <div class="story-text" id="detail-story"></div>
+          </div>
+          <div class="detail-section">
+            <div class="section-label">Walking Into a Room</div>
+            <div class="section-text" id="detail-room"></div>
+          </div>
+          <div class="detail-section">
+            <div class="section-label">The Bigger Picture</div>
+            <div class="section-text" id="detail-summary"></div>
+          </div>
+          <div class="detail-section half">
+            <div class="section-label">Growth &amp; Stress</div>
+            <div class="arrow-row">
+              <div class="arrow-chip stress">
+                <div class="chip-label">Under Stress →</div>
+                <div id="detail-stress"></div>
+              </div>
+              <div class="arrow-chip growth">
+                <div class="chip-label">In Growth →</div>
+                <div id="detail-growth"></div>
+              </div>
+            </div>
+          </div>
+          <div class="detail-section half">
+            <div class="section-label">Strengths &amp; Challenges</div>
+            <div class="strengths-grid" id="detail-strengths"></div>
+            <div class="strengths-grid" id="detail-challenges" style="margin-top:8px"></div>
+          </div>
+          <div class="detail-section">
+            <div class="section-label">Wings</div>
+            <div class="wings-grid" id="detail-wings"></div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    <footer>
-        <p>Wander • Discover • Remember who you are</p>
-    </footer>
+  </div>
+</div>
 
-    <script src="fireflies.js"></script>
-    <script src="qa-data.js"></script>
-    <script src="qa-widget.js"></script>
+<!-- ════════════════════════════════
+     PERSONAL TAB — 5w4
+════════════════════════════════ -->
+<div id="view-personal" class="view">
+  <div class="personal-layout">
+
+    <div class="personal-hero">
+      <div class="hero-eyebrow">Your Type</div>
+      <div class="hero-title">Type 5w4</div>
+      <div class="hero-subtitle">The Iconoclast</div>
+      <div class="hero-tags">
+        <span class="hero-tag">Head Center</span>
+        <span class="hero-tag">4 Wing</span>
+        <span class="hero-tag">ADHD Lens</span>
+        <span class="hero-tag">Growth → Type 8</span>
+      </div>
+    </div>
+
+    <div class="section-progress"><div class="section-progress-fill" id="section-progress-fill"></div></div>
+    <nav class="section-nav" id="personal-nav">
+      <button class="section-nav-btn active" onclick="showPanel('core', this)">Core Architecture</button>
+      <button class="section-nav-btn" onclick="showPanel('wing', this)">The 4 Wing</button>
+      <button class="section-nav-btn" onclick="showPanel('adhd', this)">ADHD Lens</button>
+      <button class="section-nav-btn" onclick="showPanel('time', this)">Time & Activation</button>
+      <button class="section-nav-btn" onclick="showPanel('energy', this)">Energy & Social</button>
+      <button class="section-nav-btn" onclick="showPanel('work', this)">Work & Career</button>
+      <button class="section-nav-btn" onclick="showPanel('relationships', this)">Relationships</button>
+      <button class="section-nav-btn" onclick="showPanel('motivation', this)">Motivation</button>
+      <button class="section-nav-btn" onclick="showPanel('growth', this)">Growth Path</button>
+      <button class="section-nav-btn" onclick="showPanel('reframes', this)">Reframes</button>
+    </nav>
+
+    <!-- CORE ARCHITECTURE -->
+    <div id="panel-core" class="personal-panel active">
+      <div class="panel-grid">
+        <div class="p-card featured full">
+          <div class="p-card-label">Core Fear & Desire</div>
+          <div class="p-card-title">The Architecture of the Five</div>
+          <div class="p-card-text">Your fundamental strategy for navigating life is to accumulate understanding. Knowledge, competence, and mental mastery feel like prerequisites to engaging with the world — not byproducts of it. Before you act, you need to understand. Before you connect, you need to feel secure in your own inner resources. Before you commit, you need to have thought it through thoroughly.</div>
+          <div class="pullquote" style="color:var(--gold-light); border-color:var(--gold-light); margin-top:24px;">Your core fear isn't really about being stupid — it's about running out. Running out of energy, resources, capacity. And so you conserve, curate, and protect the inner world with extraordinary care.</div>
+        </div>
+        <div class="p-card">
+          <div class="p-card-label">Core Fear</div>
+          <div class="p-card-title">Being Incapable</div>
+          <div class="p-card-text">Running out of inner resources. Being overwhelmed by the demands of life and exposed as unable to cope. Not an abstract anxiety — it lives in the body as real depletion when social or emotional demands exceed what you feel available to give.</div>
+        </div>
+        <div class="p-card">
+          <div class="p-card-label">Core Desire</div>
+          <div class="p-card-title">Deep Competence</div>
+          <div class="p-card-text">To understand things at a level that makes you genuinely capable — not just credentialed. The 4 wing means you need this competence to mean something. Pure knowledge hoarding doesn't satisfy you; understanding must connect to something authentic and produce something real.</div>
+        </div>
+        <div class="p-card full">
+          <div class="p-card-label">5w4 vs 5w6 — The Distinction</div>
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>5w4 — The Iconoclast (You)</th>
+                <th>5w6 — The Problem Solver</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Driven by depth and authentic expression</td><td>Driven by security and reliable systems</td></tr>
+              <tr><td>Individualistic; resists conventional frameworks</td><td>Collaborative; works within and refines structures</td></tr>
+              <tr><td>Emotionally intense beneath the surface</td><td>Emotionally cautious; manages anxiety through planning</td></tr>
+              <tr><td>Drawn to art, aesthetics, and meaning-making</td><td>Drawn to pragmatic knowledge and community</td></tr>
+              <tr><td>Knowledge as self-expression and identity</td><td>Knowledge as safety and competence</td></tr>
+              <tr><td>Melancholy-tinged; comfortable with existential questions</td><td>Anxious-tinged; seeks reassurance and solid ground</td></tr>
+              <tr><td>May feel profoundly alone in their perspective</td><td>Seeks like-minded groups and trusted allies</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- THE 4 WING -->
+    <div id="panel-wing" class="personal-panel">
+      <div class="panel-grid">
+        <div class="p-card full">
+          <div class="p-card-label">How the 4 Wing Shapes You</div>
+          <div class="p-card-title">Depth Beneath the Detachment</div>
+          <div class="p-card-text">The Four wing adds an entirely different current underneath the Five's analytical core. Where pure Fives tend toward detachment, systematization, and data-focused analysis, the 4 wing pulls you toward emotional depth, aesthetic intensity, and a hunger for authentic self-expression. You don't just want to understand the world — you want to understand yourself within it.</div>
+        </div>
+        <div class="p-card">
+          <div class="p-card-label">Emotional Intensity</div>
+          <div class="p-card-title">More Than You Show</div>
+          <div class="p-card-text">You feel things deeply — perhaps more deeply than most people in your life would guess. The Five tendency is to process emotion intellectually, to translate feeling into thought. But the 4 wing means emotions don't just pass through on the way to analysis. They accumulate, take on significance, and sometimes arrive with surprising force. You may have a rich inner emotional world that very few people ever see.</div>
+        </div>
+        <div class="p-card">
+          <div class="p-card-label">Aesthetic Hunger</div>
+          <div class="p-card-title">Form Carries Meaning</div>
+          <div class="p-card-text">Where a 5w6 might be drawn to systems and functional knowledge, you are drawn to beauty — in ideas, in art, in music, in the way a sentence is constructed. You likely have strong aesthetic preferences and may be frustrated by environments that seem aesthetically indifferent. This isn't superficiality — it's the Four's understanding that form carries meaning.</div>
+        </div>
+        <div class="p-card">
+          <div class="p-card-label">Individualism</div>
+          <div class="p-card-title">Deeply Resistant to Generic</div>
+          <div class="p-card-text">You need your intellectual life, your work, and your personal expression to bear the mark of your own thinking — not received wisdom, not consensus frameworks, not conventional approaches just because they're conventional. This makes you genuinely original. It can also make you difficult to collaborate with when you feel your authentic contribution is being flattened.</div>
+        </div>
+        <div class="p-card">
+          <div class="p-card-label">Melancholy</div>
+          <div class="p-card-title">A Companion, Not a Problem</div>
+          <div class="p-card-text">You may have a complicated relationship with melancholy — not depression necessarily, but a certain sense of longing, a feeling that something essential is always slightly out of reach. You may find yourself drawn to art, music, literature, and ideas that carry this quality. It's not something to fix. It's part of how you experience depth.</div>
+        </div>
+        <div class="p-card">
+          <div class="p-card-label">Expression Gap</div>
+          <div class="p-card-title">The Translation Problem</div>
+          <div class="p-card-text">You likely have a very rich inner world that you find extraordinarily difficult to translate into outer expression. Ideas that feel luminous internally often feel inadequate when spoken or written. The 4 wing intensifies this — it cares deeply about authentic expression, which means the bar is very high, and failure to meet it feels more significant than it might for other types.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADHD LENS -->
+    <div id="panel-adhd" class="personal-panel">
+      <div class="panel-grid">
+        <div class="p-card full">
+          <div class="p-card-label">The Intersection</div>
+          <div class="p-card-title">Where Personality Meets Neurology</div>
+          <div class="p-card-text">ADHD and the 5w4 pattern interact in ways that are both productive and particularly challenging. Understanding where they amplify each other — and where they work against each other — is some of the most practically useful self-knowledge you can develop.</div>
+        </div>
+        <div class="p-card">
+          <div class="p-card-label">Where They Overlap</div>
+          <div class="p-card-title">Hyperfocus &amp; the Deep Dive</div>
+          <div class="p-card-text">The ADHD capacity for hyperfocus maps almost perfectly onto the Five's desire for depth. When you find a topic that genuinely captures your interest, you have an extraordinary ability to go deep — far deeper and faster than most people. The challenge is that this depth-seeking is internally driven and interest-dependent. External pressure and uninteresting topics struggle to access the same system.</div>
+        </div>
+        <div class="p-card">
+          <div class="p-card-label">Where They Conflict</div>
+          <div class="p-card-title">Preparation vs. The Now-Brain</div>
+          <div class="p-card-text">Fives are pre-processors. ADHD operates on a very different timeline — regulating engagement through urgency and interest in the present moment, not future plans. This creates a specific tension: you may have elaborate mental frameworks for what you want to do, while simultaneously struggling to begin. The preparation phase can become infinite — not because you're lazy, but because your brain needs activation that your Five strategy delays.</div>
+        </div>
+        <div class="p-card">
+          <div class="p-card-label">Emotional Regulation</div>
+          <div class="p-card-title">A Compound Challenge</div>
+          <div class="p-card-text">ADHD produces emotional dysregulation that can feel sudden and disproportionate — emotions that arrive fast, feel very large, and take longer to process. The Four wing means those emotions carry significance — they become part of the identity narrative. This combination makes emotional experiences feel both overwhelming in the moment and meaningful enough to hold onto afterward.</div>
+        </div>
+        <div class="p-card">
+          <div class="p-card-label">The Consumption Loop</div>
+          <div class="p-card-title">Learning as Avoidance</div>
+          <div class="p-card-text">The Five's strategy involves accumulating information before acting. ADHD is associated with dopamine-seeking behavior that makes information consumption feel immediately rewarding. Together, these create a particularly sticky loop: researching feels productive and neurologically rewarding in ways that actual output often doesn't. The moment to watch for is researching things adjacent to the task rather than doing the task.</div>
+        </div>
+        <div class="p-card">
+          <div class="p-card-label">At Your Best</div>
+          <div class="p-card-title">The Gifts of This Combination</div>
+          <ul class="insight-list" style="margin-top:8px">
+            <li>Extraordinarily rapid, deep learning in areas that activate engagement</li>
+            <li>Highly original synthesis — connecting ideas across domains others keep separate</li>
+            <li>Creative output that emerges from genuine depth rather than surface facility</li>
+            <li>A genuinely alternative perspective — you don't naturally think like most people</li>
+            <li>Intense presence in one-on-one conversations about topics that matter</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- TIME & ACTIVATION -->
+    <div id="panel-time" class="personal-panel">
+      <div class="panel-grid">
+        <div class="p-card full">
+          <div class="p-card-label">Your Relationship With Time</div>
+          <div class="p-card-title">One of the Most Practically Important Things to Understand</div>
+          <div class="p-card-text">This is where personality and neurology collide in a way that affects almost everything else — and it's one of the least-discussed dimensions of the 5w4 with ADHD combination.</div>
+        </div>
+        <div class="p-card">
+          <div class="p-card-label">The Five's Time Problem</div>
+          <div class="p-card-title">The Future Is Not Quite Real</div>
+          <div class="p-card-text">Fives have a specific relationship with time that doesn't get named often enough: the future doesn't feel fully real. Because it's abstract and unverifiable, it's hard to feel genuine urgency about it. There is always more to understand before the moment of action arrives. The preparation phase feels current and real; the deadline feels distant and theoretical, right up until it isn't.</div>
+          <div class="callout-box">This is why "just plan better" consistently fails Fives. The problem isn't a missing calendar. It's that the calendar's future entries don't generate the same felt reality as the present moment of thinking and researching.</div>
+        </div>
+        <div class="p-card">
+          <div class="p-card-label">The ADHD Time Problem</div>
+          <div class="p-card-title">Now and Not Now</div>
+          <div class="p-card-text">The ADHD brain tends to experience time as having only two categories: now and not now. Future events exist in a kind of undifferentiated "not now" until they cross a threshold of urgency and become immediate.</div>
+          <div class="time-diagram">
+            <div class="time-block now">
+              <div class="tb-label">Now</div>
+              <div class="tb-val">Vivid</div>
+              <div class="tb-sub">Fully real. Activating. Can engage.</div>
+            </div>
+            <div class="time-block notnow">
+              <div class="tb-label">Not Now</div>
+              <div class="tb-val">Abstract</div>
+              <div class="tb-sub">Undifferentiated. Tomorrow = next month = next year.</div>
+            </div>
+          </div>
+        </div>
+        <div class="p-card full">
+          <div class="p-card-label">The Compound Effect</div>
+          <div class="p-card-title">What This Looks Like in Practice</div>
+          <div class="p-card-text">For a 5w4 with ADHD, these patterns reinforce each other in a specific way. The Five's preparation loop keeps the task in a pre-engagement phase indefinitely. ADHD's time blindness means the approaching deadline doesn't generate mounting urgency the way it does for neurotypical people — it arrives as a sudden alarm rather than a slow build. The Four wing adds a third variable: a tendency to anchor in the emotional present, making the past feel vivid and the future feel thin.</div>
+          <div class="pullquote">The result looks like procrastination from the outside and feels like genuine intention followed by genuine surprise from the inside. You meant to do it. You thought about doing it extensively. And then the deadline was here.</div>
+        </div>
+        <div class="p-card full">
+          <div class="p-card-label">Working With Your Time Architecture</div>
+          <div class="p-card-title">Strategies Designed for Your Actual System</div>
+          <ul class="insight-list" style="margin-top:8px">
+            <li><strong>Externalize the future</strong> — make deadlines viscerally real before you need to act. Visual timers and countdowns work better than calendar entries.</li>
+            <li><strong>Create artificial "now" moments</strong> — break future tasks into pieces with immediate, concrete starting points. The goal isn't to plan better; it's to manufacture felt-urgency.</li>
+            <li><strong>Design for your actual pattern</strong> — if you're deadline-activated, build in real intermediate deadlines with real stakes, not just personal intentions.</li>
+            <li><strong>Name the "now / not now" binary</strong> — recognizing when something has slipped into "not now" is often the first step to deliberately pulling it forward.</li>
+            <li><strong>Build in recovery buffers</strong> — assume your optimistic time estimates are wrong. They are. Every time.</li>
+          </ul>
+          <div class="callout-box">The goal isn't to become someone who experiences time differently. It's to build external structures that compensate for an internal time architecture that is genuinely, neurologically different from the default — and stop interpreting the gap as a character failure.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENERGY & SOCIAL -->
+    <div id="panel-energy" class="personal-panel">
+      <div class="panel-grid">
+        <div class="p-card full">
+          <div class="p-card-label">Social Battery Architecture</div>
+          <div class="p-card-title">Finite, Real, and Worth Protecting</div>
+          <div class="p-card-text">Your social battery is genuinely finite — and understanding its architecture matters more for you than for most types. As a Five, interaction feels expensive. Every social engagement, every demand for emotional availability, every unstructured conversation draws from a resource pool you are always quietly monitoring. This is not misanthropy. It's a real experience of resource depletion that most extroverted or Feeling-centered types simply don't share.</div>
+          <div class="pullquote">Practical reframe: Your social battery management isn't a social deficit — it's intelligent resource allocation for a system that runs on depth. The goal isn't more interaction; it's better-chosen interaction.</div>
+        </div>
+        <div class="p-card">
+          <div class="p-card-label">The 4 Wing</div>
+          <div class="p-card-title">Capable of Intense Connection</div>
+          <div class="p-card-text">You are capable of intense connection — but only on your terms and at your own pace. You likely have a small number of relationships you invest in deeply, and a much larger number of people you keep at a carefully managed distance. The depth of investment in close relationships can surprise people who assumed you were simply aloof.</div>
+        </div>
+        <div class="p-card">
+          <div class="p-card-label">ADHD Layer</div>
+          <div class="p-card-title">Draining and Overstimulating</div>
+          <div class="p-card-text">Social interaction can be simultaneously draining and overstimulating. Highly unstructured, large-group, or obligation-driven situations are exhausting in ways that require significant recovery time afterward. One-on-one conversations about ideas you find genuinely interesting operate on a completely different energy economy.</div>
+        </div>
+        <div class="p-card full">
+          <div class="p-card-label">Energy Mapping</div>
+          <div class="p-card-title">What Costs vs. What Replenishes</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:8px;">
+            <div>
+              <div style="font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#8a4a2a;margin-bottom:10px;">Costly</div>
+              <ul class="insight-list">
+                <li>Large unstructured social gatherings</li>
+                <li>Obligation-based interaction</li>
+                <li>Emotional demands without prior agreement</li>
+                <li>Interruptions during deep focus</li>
+                <li>Noise, chaos, and sensory overload</li>
+              </ul>
+            </div>
+            <div>
+              <div style="font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#3a6a3a;margin-bottom:10px;">Replenishing</div>
+              <ul class="insight-list">
+                <li>Solitude with no incoming demands</li>
+                <li>One-on-one with someone intellectually resonant</li>
+                <li>Deep focus on a topic of genuine interest</li>
+                <li>Creative or aesthetic engagement</li>
+                <li>Time in nature / physical movement</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WORK & CAREER -->
+    <div id="panel-work" class="personal-panel">
+      <div class="panel-grid">
+        <div class="p-card full">
+          <div class="p-card-label">Work Environment</div>
+          <div class="p-card-title">You Thrive With Autonomy, Depth, and Distance</div>
+          <div class="p-card-text">You are most likely to thrive in environments that give you meaningful autonomy, opportunities for genuine depth, and enough distance from constant interpersonal management to do real thinking. You are least likely to thrive in environments that are highly collaborative, heavily process-driven, or that reward speed over depth.</div>
+        </div>
+        <div class="p-card">
+          <div class="p-card-label">Where You Excel</div>
+          <ul class="insight-list" style="margin-top:8px">
+            <li>Deep individual research, analysis, or writing that requires sustained intellectual engagement</li>
+            <li>Creative or design work with genuine aesthetic dimension</li>
+            <li>Roles that position you as the expert or architect rather than the executor</li>
+            <li>Environments that tolerate or reward unconventional approaches</li>
+            <li>Work you believe in intrinsically — the ADHD motivation system requires genuine interest</li>
+          </ul>
+        </div>
+        <div class="p-card">
+          <div class="p-card-label">Where You Struggle</div>
+          <ul class="insight-list" style="margin-top:8px">
+            <li>High-volume, fast-turnaround tasks without intrinsic interest</li>
+            <li>Heavily collaborative or consensus-dependent environments</li>
+            <li>Work that feels meaningless or generically defined</li>
+            <li>Constant interruptions that break the deep-focus state</li>
+            <li>Deadline pressure before the interest or urgency threshold has been activated</li>
+          </ul>
+        </div>
+        <div class="p-card full">
+          <div class="p-card-label">The Output Problem</div>
+          <div class="p-card-title">The Gap Between Inner Richness and Public Production</div>
+          <div class="p-card-text">One of the most significant work challenges for 5w4s with ADHD is the gap between private intellectual richness and public output. You may accumulate enormous understanding without producing from it.</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px;">
+            <div style="padding:16px;background:rgba(74,58,107,0.06);border-top:2px solid var(--fivew4);border-radius:2px;">
+              <div style="font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--fivew4);margin-bottom:8px;">Five Pattern</div>
+              <div style="font-size:15px;font-weight:300;line-height:1.65;color:#3a3028;">Hoarding knowledge feels safer than exposing it to judgment.</div>
+            </div>
+            <div style="padding:16px;background:rgba(90,74,122,0.06);border-top:2px solid #5a4a7a;border-radius:2px;">
+              <div style="font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#5a4a7a;margin-bottom:8px;">4 Wing Pattern</div>
+              <div style="font-size:15px;font-weight:300;line-height:1.65;color:#3a3028;">The bar for authentic expression is very high. Imperfect output feels like a failure of identity.</div>
+            </div>
+            <div style="padding:16px;background:rgba(139,74,47,0.06);border-top:2px solid var(--accent);border-radius:2px;">
+              <div style="font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;">ADHD Pattern</div>
+              <div style="font-size:15px;font-weight:300;line-height:1.65;color:#3a3028;">Task initiation is genuinely difficult without external structure or urgency.</div>
+            </div>
+          </div>
+          <div class="callout-box" style="margin-top:16px;">Recognizing all three layers is important — because a purely motivational response ("just start") misses the neurological dimension, while a purely clinical response misses the psychological one.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RELATIONSHIPS -->
+    <div id="panel-relationships" class="personal-panel">
+      <div class="panel-grid">
+        <div class="p-card full">
+          <div class="p-card-label">Relational World</div>
+          <div class="p-card-title">Smaller, Slower, Richer</div>
+          <div class="p-card-text">Your relational world is smaller and slower-moving than average — and richer in depth. You need relationships that give you space, don't demand constant emotional availability, and can survive long periods of relative withdrawal. In return, you offer a quality of attention, loyalty, and genuine interest that is genuinely rare.</div>
+        </div>
+        <div class="p-card">
+          <div class="p-card-label">What You Need</div>
+          <ul class="insight-list" style="margin-top:8px">
+            <li>Space and privacy without it being read as rejection</li>
+            <li>Intellectual and creative resonance — someone who wants to explore ideas with you</li>
+            <li>Tolerance for your emotional processing being slow and internal</li>
+            <li>A relationship that doesn't require performing sociability on a schedule</li>
+            <li>Trust earned over time — you're not quick to open up, but when you do, it is real</li>
+          </ul>
+        </div>
+        <div class="p-card">
+          <div class="p-card-label">What You Offer</div>
+          <ul class="insight-list" style="margin-top:8px">
+            <li>Intense, undivided attention to the people and ideas you care about</li>
+            <li>Deep loyalty once trust is established</li>
+            <li>The ability to see people in genuinely interesting and complex ways</li>
+            <li>A relationship built on actual understanding rather than social performance</li>
+          </ul>
+        </div>
+        <div class="p-card full">
+          <div class="p-card-label">Where Friction Arises</div>
+          <div class="p-card-title">The Withdrawal Reflex</div>
+          <div class="p-card-text">The most common relational friction for 5w4s involves the withdrawal reflex. When you feel overwhelmed, misunderstood, or depleted, your instinct is to pull back — not to reach out. This can register as coldness or abandonment to people who don't understand your process.</div>
+          <div class="p-card-text" style="margin-top:12px;">The 4 wing can add a layer of romantic longing combined with emotional unavailability — wanting deep connection while also finding it threatening to maintain. ADHD adds the pattern of inconsistency — you may be deeply present in a conversation and then entirely absent for days. For people who understand this, it's just your rhythm.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MOTIVATION -->
+    <div id="panel-motivation" class="personal-panel">
+      <div class="panel-grid">
+        <div class="p-card full">
+          <div class="p-card-label">Procrastination Architecture</div>
+          <div class="p-card-title">Understanding Your Specific System</div>
+          <div class="p-card-text">Understanding your specific procrastination architecture is one of the highest-leverage things you can do for yourself, because it's not just ADHD and it's not just personality — it's the specific combination of the two.</div>
+        </div>
+        <div class="p-card">
+          <div class="p-card-label">The Interest-Competence Threshold</div>
+          <div class="p-card-title">Two Requirements, Not One</div>
+          <div class="p-card-text">Before you will comfortably begin a task, two things typically need to be true: (1) you are genuinely interested or the task has sufficient urgency, and (2) you feel adequately prepared. Neither alone is sufficient. An interesting task you feel under-prepared for stalls on preparation. A task you feel prepared for but don't find interesting stalls on activation. Tasks that fail both criteria are nearly impossible to start.</div>
+        </div>
+        <div class="p-card">
+          <div class="p-card-label">Deadline Activation</div>
+          <div class="p-card-title">Your Brain's Ignition Switch</div>
+          <div class="p-card-text">Like many ADHD brains, yours may have a deadline-dependent activation system — where genuine urgency creates the focus that otherwise requires enormous effort to manufacture. The problem: chronically relying on deadlines is exhausting, produces lower-quality work than your potential, and leaves a trail of things that never had external deadlines and therefore never got done.</div>
+        </div>
+        <div class="p-card full">
+          <div class="p-card-label">Working With Your Motivation System</div>
+          <ul class="insight-list" style="margin-top:8px">
+            <li><strong>Identify your interest activation triggers</strong> — what reliably turns on genuine engagement? New frameworks, aesthetic challenges, problems with no obvious solution, things that feel personally important.</li>
+            <li><strong>Externalize your structure</strong> — external accountability, time constraints, or body-doubling can provide scaffolding your internal system struggles to generate alone.</li>
+            <li><strong>Name the research loop when it's happening</strong> — you don't have to eliminate it, but recognizing it as avoidance rather than preparation gives you a choice point.</li>
+            <li><strong>Reduce the start threshold</strong> — the first action doesn't have to be the full task. It just has to create forward motion and cross the activation threshold.</li>
+            <li><strong>Design environments that protect deep focus</strong> — because hyperfocus is your primary productivity mode, protecting the conditions that allow it matters more for you than for most.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- GROWTH PATH -->
+    <div id="panel-growth" class="personal-panel">
+      <div class="panel-grid">
+        <div class="p-card full">
+          <div class="p-card-label">Integration & Disintegration</div>
+          <div class="p-card-title">The Direction of Development</div>
+          <div class="arrow-integration" style="margin-top:16px">
+            <div class="integration-card growth">
+              <div class="ic-label">In Growth → Type 8</div>
+              <div class="ic-type">The Challenger</div>
+              <div class="ic-text">Not the unhealthy Eight's domination, but the healthy Eight's confidence, presence, and willingness to engage with the world as it is rather than from behind a prepared position.</div>
+            </div>
+            <div class="integration-card stress">
+              <div class="ic-label">Under Stress → Type 7</div>
+              <div class="ic-type">The Enthusiast</div>
+              <div class="ic-text">Your ordinarily focused mind begins to jump between ideas, avoid depth, and seek stimulation or novelty rather than mastery. With ADHD, this pattern can feel particularly disorienting.</div>
+            </div>
+          </div>
+        </div>
+        <div class="p-card full">
+          <div class="p-card-label">What Integration Looks Like For You</div>
+          <div class="p-card-title">Moving Toward Type 8</div>
+          <ul class="insight-list" style="margin-top:8px">
+            <li><strong>Acting before you feel "ready"</strong> — trusting that your understanding is sufficient and that engagement will deepen it, not precede it.</li>
+            <li><strong>The body first</strong> — this is the most underrated entry point for Five integration. Exercise, physical discipline, movement practices, and time outdoors can shift your relationship to action more effectively than any amount of resolving to be more decisive. The body moves first; the confidence follows.</li>
+            <li><strong>Bringing your perspective into the world</strong> — believing your contribution has value before it is perfected. Articulating an idea often completes it.</li>
+            <li><strong>Claiming space</strong> — speaking up, taking a stand, making decisions without over-consulting your internal preparation system. The Eight's gift isn't certainty; it's the willingness to act without it.</li>
+            <li><strong>Generosity with your knowledge</strong> — Fives in growth share rather than hoard. They trust that giving doesn't deplete them.</li>
+          </ul>
+          <div class="callout-box" style="margin-top:16px;">Integration for you is fundamentally about trust: trusting that you have enough, know enough, and are enough to engage — not as a perfectly prepared expert, but as someone who is genuinely present and genuinely capable.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REFRAMES -->
+    <div id="panel-reframes" class="personal-panel">
+      <div class="panel-grid">
+        <div class="p-card full">
+          <div class="p-card-label">Key Reframes</div>
+          <div class="p-card-title">The Story You Tell Yourself vs. A More Accurate Frame</div>
+          <div class="p-card-text" style="margin-bottom:20px">These are the cognitive reframes most useful for your specific pattern — not generic positivity, but precise reorientations based on how your wiring actually works.</div>
+          <table class="reframe-table">
+            <tbody>
+              <tr><td>I'm not ready yet — I need to understand more first</td><td>Understanding deepens through engagement, not before it</td></tr>
+              <tr><td>I'm too sensitive / too intense</td><td>Depth of feeling is a feature of your intelligence, not a flaw</td></tr>
+              <tr><td>I'm lazy or undisciplined (ADHD shame)</td><td>Your brain requires interest-based activation — design for it, don't fight it</td></tr>
+              <tr><td>Nobody understands the way I see things</td><td>Your perspective is genuinely distinct — find its right audience</td></tr>
+              <tr><td>I should be more productive / more social / more normal</td><td>You are optimized for depth, not volume — measure accordingly</td></tr>
+              <tr><td>My emotions are too much</td><td>Your emotional range is an asset; your processing time is legitimate</td></tr>
+              <tr><td>I'm wasting my potential</td><td>You may be in a long preparation phase — keep building, keep creating</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="p-card featured full">
+          <div class="p-card-label">Summary</div>
+          <div class="p-card-title">Your Wiring at a Glance</div>
+          <div class="p-card-text">You are someone who thinks deeply, feels intensely, and engages selectively. You move through the world as an observer before you move through it as a participant — gathering understanding, building frameworks, and waiting until you feel adequately equipped. The Four wing means this is never just abstract: it's personal, aesthetic, and identity-laden. ADHD means the executive architecture that most people use to bridge understanding and action is inconsistent for you — and that you need environments, structures, and tasks that honor your interest-dependent activation system.</div>
+          <div class="pullquote" style="color:var(--gold-light);border-color:var(--gold-light);margin-top:24px;">At your best, you produce work, ideas, and connections that most people simply cannot access. Your challenge is getting out of your own head long enough to let that happen.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</main>
+
+<!-- FOUNDATION MODALS -->
+<div class="foundation-modal-overlay" id="foundation-overlay" onclick="closeFoundation(event)">
+  <div class="foundation-modal">
+    <div class="modal-header">
+      <button class="modal-close" onclick="closeFoundation()">×</button>
+      <div class="modal-title" id="modal-title"></div>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// TAB SWITCHING — syncs header + mobile nav
+// ═══════════════════════════════════════
+let currentTab = 'learn';
+
+function switchTab(tab, triggerEl) {
+  currentTab = tab;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + tab).classList.add('active');
+
+  // Sync both navs
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    if (b.textContent.toLowerCase().includes(tab === 'learn' ? 'learn' : '5w4')) b.classList.add('active');
+  });
+  document.getElementById('mob-learn').classList.toggle('active', tab === 'learn');
+  document.getElementById('mob-personal').classList.toggle('active', tab === 'personal');
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // Re-trigger card animations for new tab
+  setTimeout(observeCards, 100);
+}
+
+// ═══════════════════════════════════════
+// SWIPE GESTURE between tabs
+// ═══════════════════════════════════════
+let touchStartX = 0, touchStartY = 0;
+
+document.addEventListener('touchstart', e => {
+  touchStartX = e.changedTouches[0].screenX;
+  touchStartY = e.changedTouches[0].screenY;
+}, { passive: true });
+
+document.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].screenX - touchStartX;
+  const dy = e.changedTouches[0].screenY - touchStartY;
+  if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+    if (dx < 0 && currentTab === 'learn') switchTab('personal', null);
+    if (dx > 0 && currentTab === 'personal') switchTab('learn', null);
+  }
+}, { passive: true });
+
+// ═══════════════════════════════════════
+// PERSONAL PANEL SWITCHING + PROGRESS BAR
+// ═══════════════════════════════════════
+const panels = ['core','wing','adhd','time','energy','work','relationships','motivation','growth','reframes'];
+
+function showPanel(panel, btn) {
+  document.querySelectorAll('.personal-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.section-nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + panel).classList.add('active');
+  if (btn) btn.classList.add('active');
+
+  // Update progress bar
+  const idx = panels.indexOf(panel);
+  const pct = ((idx + 1) / panels.length) * 100;
+  document.getElementById('section-progress-fill').style.width = pct + '%';
+
+  // Scroll active nav btn into view
+  if (btn) btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+
+  // Re-trigger card animations
+  setTimeout(observeCards, 80);
+}
+
+// ═══════════════════════════════════════
+// CARD ENTRANCE ANIMATIONS (IntersectionObserver)
+// ═══════════════════════════════════════
+function observeCards() {
+  const cards = document.querySelectorAll(
+    '.p-card:not(.in-view), .detail-card:not(.in-view), .foundation-card:not(.in-view), .wing-card:not(.in-view), .integration-card:not(.in-view)'
+  );
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        // Stagger siblings slightly
+        const siblings = Array.from(entry.target.parentElement.children);
+        const delay = siblings.indexOf(entry.target) * 60;
+        setTimeout(() => entry.target.classList.add('in-view'), delay);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+  cards.forEach(card => {
+    card.classList.add('animate-card');
+    observer.observe(card);
+  });
+}
+
+// Add animate-card to relevant elements on load
+window.addEventListener('DOMContentLoaded', () => {
+  observeCards();
+  updateScrollTop();
+});
+
+// ═══════════════════════════════════════
+// SCROLL-TO-TOP VISIBILITY
+// ═══════════════════════════════════════
+function updateScrollTop() {
+  const btn = document.getElementById('scroll-top');
+  if (window.scrollY > 300) btn.classList.add('visible');
+  else btn.classList.remove('visible');
+}
+window.addEventListener('scroll', updateScrollTop, { passive: true });
+
+// ═══════════════════════════════════════
+// DIAGRAM — node selection ring + tooltip
+// ═══════════════════════════════════════
+let selectedType = null;
+
+document.querySelectorAll('.type-node').forEach(node => {
+  // Desktop: tooltip on hover
+  node.addEventListener('mouseenter', e => {
+    const name = node.dataset.name;
+    const t = node.dataset.type;
+    const tip = document.getElementById('node-tooltip');
+    tip.textContent = `Type ${t} · ${name}`;
+    tip.style.opacity = '1';
+  });
+  node.addEventListener('mousemove', e => {
+    const tip = document.getElementById('node-tooltip');
+    const rect = document.querySelector('.diagram-container').getBoundingClientRect();
+    tip.style.left = (e.clientX - rect.left + 12) + 'px';
+    tip.style.top = (e.clientY - rect.top - 32) + 'px';
+  });
+  node.addEventListener('mouseleave', () => {
+    document.getElementById('node-tooltip').style.opacity = '0';
+  });
+});
+
+function setSelectedRing(num) {
+  // Clear all rings
+  document.querySelectorAll('.node-selected-ring').forEach(r => r.style.opacity = '0');
+  if (num && selectedType !== num) {
+    document.getElementById('ring-' + num).style.opacity = '1';
+    selectedType = num;
+  } else {
+    selectedType = null;
+  }
+}
+
+// ═══════════════════════════════════════
+// TYPE DATA
+// ═══════════════════════════════════════
+const types = {
+  1: {
+    name: "The Reformer", tagline: "Principled, purposeful, self-controlled, and perfectionistic",
+    center: "Gut / Body", fear: "Being corrupt, evil, or defective", desire: "To be good, to have integrity",
+    color: "#5c6b4e",
+    story: "The One's story is the story of the child who learned that the world has a right way and a wrong way — and that love, acceptance, and safety depended on being good. Not just doing good things, but being a good person, with the emphasis on the being. Somewhere early in life, an inner critic was born. Not an outside voice, but an internalized standard-setter that never clocks out. The One's life is, in many ways, a continuous negotiation with that voice — trying to meet its standard, trying to quiet it, and sometimes wondering if anyone else can hear it at all.",
+    room: "A One walks into a room and immediately begins assessing it — not maliciously, but automatically. What's out of place? What could be better? What's being done wrong? This isn't judgmentalism for its own sake; it's a nervous system wired to notice the gap between what is and what should be. They often feel quiet tension in environments they can't improve, and quiet satisfaction in ones they can.",
+    summary: "Ones are driven by an internalized critic — a relentless inner voice that evaluates, corrects, and compares against an ideal standard. At their best, they are principled reformers with remarkable self-discipline and powerful moral clarity. At average levels, this manifests as perfectionism, rigidity, and chronic dissatisfaction. Under stress, Ones become uncharacteristically moody (moving toward 4). In growth, they access the joy and spontaneity of 7. The unique gift of the One: in a world that often cuts corners, the One refuses to.",
+    stress: "Type 4 — becomes moody, self-pitying, irrational",
+    growth: "Type 7 — becomes joyful, spontaneous, lighter",
+    strengths: ["Integrity", "High standards", "Reliability", "Follow-through", "Ethical clarity"],
+    challenges: ["Self-criticism", "Rigidity", "Resentment", "Difficulty relaxing", "Black-and-white thinking"],
+    wings: [
+      { label: "1w2", text: "The 2 wing softens the One's edges with warmth and relational investment. These Ones are more concerned with people than principles in isolation — they want to improve the world and bring others along. They tend to be more emotionally expressive, attuned to how their standards land on others, and drawn to teaching, counseling, or advocacy. The inner critic is still active, but moderated by genuine care." },
+      { label: "1w9", text: "The 9 wing gives the One a more detached, philosophical quality. These Ones are idealistic in a quieter, more interior way — less likely to push their standards on others, more likely to withdraw when the world fails to meet expectations. They can appear more serene than they feel; a deep current of unexpressed frustration often runs beneath the calm surface." }
+    ]
+  },
+  2: {
+    name: "The Helper", tagline: "Caring, interpersonal, generous, and people-pleasing",
+    center: "Heart / Feeling", fear: "Being unwanted or unlovable", desire: "To feel loved and needed",
+    color: "#9b4a5a",
+    story: "The Two's story is the story of a child who learned to read the room before reading anything else. Somewhere early in life, they discovered that being needed was the surest path to being loved — and that the best way to secure connection was to become indispensable. This wasn't cynical; it came from a real, warm-hearted desire to care. But woven into that care is a fear so deep it often goes unnamed: the fear that if they stopped giving, they would simply not be wanted. The Two's life is the ongoing search for proof that they are loved not for what they do, but for who they are.",
+    room: "A Two walks into a room and immediately begins scanning — not for threats, but for needs. Who looks lonely? Who needs a refill? Who seems overwhelmed? This attunement is instinctive and genuine, but it also serves a function: by finding a way to be useful, the Two finds a way to belong. They feel most at ease when they have a role in the relational ecosystem of the room. They feel most anxious when they can't find one.",
+    summary: "Twos orient to the world through relationships. Their core strategy is to make themselves indispensable — anticipating needs, offering support, positioning themselves as essential. This comes from genuine warmth, but also from a subconscious belief that love must be earned through giving. At healthy levels, Twos are remarkably caring and generous in ways that genuinely elevate others. At average levels, they can become possessive, giving with invisible strings attached. The unique gift of the Two: their extraordinary capacity to make people feel seen, valued, and cared for.",
+    stress: "Type 8 — becomes domineering, confrontational",
+    growth: "Type 4 — becomes emotionally honest, self-aware",
+    strengths: ["Warmth", "Empathy", "Generosity", "Relational intelligence", "Attunement"],
+    challenges: ["Martyrdom", "Indirect needs expression", "Possessiveness", "Difficulty receiving"],
+    wings: [
+      { label: "2w1", text: "The 1 wing gives this Two a principled, duty-driven quality. They are less about personal connection and more about service in a structured, moral sense — giving because it's right, not just because it earns love. They tend to be more self-critical, more organized in their giving, and sometimes more judgmental about whether others are giving enough too." },
+      { label: "2w3", text: "The 3 wing amplifies the Two's social intelligence and adds ambition to their warmth. These Twos are charming, image-aware, and skilled at using connection to achieve. They are more extroverted, more aware of how their generosity is perceived, and more likely to build helping into a personal brand or public identity." }
+    ]
+  },
+  3: {
+    name: "The Achiever", tagline: "Adaptable, excelling, driven, and image-conscious",
+    center: "Heart / Feeling", fear: "Being worthless or without inherent value", desire: "To feel valuable and worthy of love",
+    color: "#c47c2e",
+    story: "The Three's story is the story of a child who learned that love was conditional on performance. The message landed: you are what you accomplish. And so the Three became extraordinarily good at accomplishing — learning to read what each audience valued, to become that, and to succeed in a way that felt like it earned the love that should have been freely given. Beneath every achievement is a question the Three is still trying to answer: am I worth something if I stop?",
+    room: "A Three walks into a room and immediately calibrates. Who's here? What does success look like in this particular context? What version of me belongs? Threes can shift registers almost unconsciously: business lunch, creative brainstorm, casual party. What they rarely show is what's happening underneath: a constant, low-frequency monitoring of whether they are being perceived as valuable. The cost of always performing is that they sometimes lose track of which version is actually them.",
+    summary: "Threes are the archetype of ambition — but the ambition is a vehicle, not the destination. What they're really after is the feeling that they are enough. At their best, they are inspiring, competent leaders who make the people around them believe more is possible. The particular anguish of the Three is succeeding at everything and still not feeling like enough — because no achievement has ever solved the underlying question. The unique gift of the Three: their capacity to embody possibility, making success feel not just achievable but contagious.",
+    stress: "Type 9 — disengages, loses motivation",
+    growth: "Type 6 — becomes loyal, cooperative, trustworthy",
+    strengths: ["Drive", "Adaptability", "Competence", "Charisma", "Goal-orientation"],
+    challenges: ["Inauthenticity", "Workaholism", "Difficulty with failure", "Emotional disconnection"],
+    wings: [
+      { label: "3w2", text: "The 2 wing pulls the Three toward people — success, for them, is relational as much as material. These Threes are warmer, more emotionally attuned, and more invested in being genuinely liked rather than simply admired. They succeed through connection and often excel in roles where charisma, team motivation, and interpersonal intelligence drive results." },
+      { label: "3w4", text: "The 4 wing introduces depth, individualism, and a need for authenticity that sits in tension with the Three's performance drive. These Threes want to succeed — but they also want their success to mean something. They are more introspective, more creative, and more prone to an identity crisis when their achievements feel hollow." }
+    ]
+  },
+  4: {
+    name: "The Individualist", tagline: "Expressive, dramatic, self-absorbed, and temperamental",
+    center: "Heart / Feeling", fear: "Having no identity or significance, being ordinary", desire: "To be unique, to find authentic significance",
+    color: "#5a4a7a",
+    story: "The Four's story is the story of the child who felt, from a very early age, that they were somehow different — set apart from others in a way that was both special and lonely. They couldn't fully name what was missing, only that something was. And so began a lifelong interior quest: to understand themselves deeply enough to finally feel whole, and to express that understanding in a way that would be recognized and received. The Four moves through life carrying a beautiful, aching question: will anyone ever truly see me — all of me — and still choose to stay?",
+    room: "A Four walks into a room and immediately registers the emotional temperature — not just of the group, but of the space itself. They notice what's authentic and what's performed. Fours often feel like a visiting anthropologist in ordinary social settings — present, observant, slightly apart. They're looking for the one person in the room who might be real.",
+    summary: "Fours are defined by an abiding sense that something essential is missing in them — and a longing to find and express their authentic self. They are the most emotionally complex of the types, drawn to depth, beauty, melancholy, and meaning. No type understands the interior landscape of human experience more intimately. At average levels, they romanticize suffering or fixate on what is absent. The unique gift of the Four: their capacity to transform personal pain into something universally meaningful — art and understanding from the experiences others try to hide.",
+    stress: "Type 2 — becomes clingy, dependent",
+    growth: "Type 1 — becomes disciplined, grounded, objective",
+    strengths: ["Depth", "Creativity", "Empathy", "Authenticity", "Aesthetic sensibility"],
+    challenges: ["Moodiness", "Envy", "Self-absorption", "Romanticizing suffering", "Avoidance of the ordinary"],
+    wings: [
+      { label: "4w3", text: "The 3 wing gives this Four more outward energy and ambition. They still crave authenticity and depth, but they also want recognition — they want their unique inner world seen and celebrated. These Fours are more extroverted, more image-aware, and more willing to package their emotional depth for an audience." },
+      { label: "4w5", text: "The 5 wing turns the Four's emotional intensity inward and gives it an intellectual dimension. These Fours are more withdrawn, more cerebral, and more comfortable with solitude. They process their emotional world through analysis as much as feeling — building rich inner worlds that very few people are ever invited into." }
+    ]
+  },
+  5: {
+    name: "The Investigator", tagline: "Perceptive, innovative, secretive, and isolated",
+    center: "Head / Thinking", fear: "Being incapable or overwhelmed by the world", desire: "To be capable and competent; to understand",
+    color: "#2e5e8e",
+    story: "The Five's story is the story of the child who discovered that the world was more than they could handle — too loud, too demanding, too depleting — and who found in the life of the mind a place that was entirely their own. Knowledge became both armor and home. The Five's deepest fear isn't really about being stupid — it's about running out. Running out of energy, resources, capacity. And so they conserve, curate, and protect the inner world with extraordinary care.",
+    room: "A Five walks into a room and immediately looks for the exit — not literally, but energetically. They want to know: can I leave when I need to? They position themselves at the margins, observe before engaging, and mentally calculate how much energy this interaction will cost. They are genuinely curious about the people in the room, but curiosity and engagement are not the same thing. A Five may study you carefully for months before deciding you are worth the investment of real contact.",
+    summary: "Fives are driven by a need to understand. They conserve their inner resources and invest them in building mental mastery. At their best, Fives are visionary, insightful, and intellectually pioneering — capable of developing ideas and frameworks that genuinely advance human understanding. At average levels, they detach from people and needs, hoarding knowledge and withdrawing into an increasingly private inner world. The unique gift of the Five: their capacity for radical independent thought — unconstrained by the need for consensus, they see what others miss.",
+    stress: "Type 7 — becomes scattered, impulsive, escapist",
+    growth: "Type 8 — becomes confident, decisive, present",
+    strengths: ["Analytical depth", "Independent thinking", "Focus", "Objectivity", "Innovation"],
+    challenges: ["Emotional detachment", "Isolation", "Scarcity thinking", "Over-preparation", "Difficulty acting"],
+    wings: [
+      { label: "5w4", text: "The 4 wing adds emotional intensity, aesthetic hunger, and a need for authentic self-expression to the Five's analytical core. These Fives are more inward, more individualistic, and more invested in their inner world as a source of identity. They are drawn to art, literature, and ideas that carry emotional weight, and often have a creative outlet that means a great deal to them even if few people ever see it." },
+      { label: "5w6", text: "The 6 wing gives the Five more social awareness, loyalty, and a drive to belong to something reliable. These Fives are more collaborative, more interested in community and shared systems, and more likely to use their knowledge in service of a group rather than purely for their own mastery. Anxiety still present, but expressed through contingency planning and alliance-building rather than pure withdrawal." }
+    ]
+  },
+  6: {
+    name: "The Loyalist", tagline: "Engaging, responsible, anxious, and suspicious",
+    center: "Head / Thinking", fear: "Being without support, security, or guidance", desire: "To have security, support, and certainty",
+    color: "#3d6b6b",
+    story: "The Six's story is the story of a child who learned early that the world is not reliably safe — and who developed a finely tuned threat-detection system as a result. They became the person who reads the fine print, who asks 'but what if it goes wrong?', who builds contingency plans for their contingency plans. The Six's deepest longing is for a trustworthy world — a ground that doesn't shift, an authority that won't betray, a community that will hold. And their deepest challenge is learning to trust themselves as that anchor.",
+    room: "A Six walks into a room and begins a rapid, largely unconscious security scan. Who are the power brokers? What are the unspoken rules? Is this environment safe? They're watching for inconsistencies — between what people say and how they behave, between official structures and actual dynamics. A Six will often test people before trusting them, not out of cruelty but out of necessity. Once you've passed the test, their loyalty is nearly unconditional.",
+    summary: "Sixes are the most anxiety-driven type — but also, paradoxically, among the most courageous. They are constantly scanning for threat, questioning authority while also craving it, and building alliances and contingency plans. At their best, Sixes are remarkably loyal, perceptive, and community-oriented. There are two subtypes: phobic Sixes (who shrink from threat) and counter-phobic Sixes (who confront it head-on). The unique gift of the Six: when a Six is with you, they are truly, deeply with you.",
+    stress: "Type 3 — becomes competitive, image-driven",
+    growth: "Type 9 — becomes relaxed, trusting, grounded",
+    strengths: ["Loyalty", "Diligence", "Perceptiveness", "Courage", "Relational commitment"],
+    challenges: ["Anxiety", "Self-doubt", "Reactivity", "Suspicion", "Difficulty trusting own judgment"],
+    wings: [
+      { label: "6w5", text: "The 5 wing pulls this Six toward independence, analysis, and intellectual self-reliance. These Sixes seek security through understanding rather than community alone — they want to think their way to solid ground. They are more introverted, more skeptical, and more likely to trust their own research over received authority." },
+      { label: "6w7", text: "The 7 wing gives this Six more social warmth, humor, and forward momentum. These Sixes manage their anxiety by staying engaged and looking for the upside — their fear is real, but they counterbalance it with optimism and activity. They can vacillate between genuine enthusiasm and sudden anxiety, sometimes within the same conversation." }
+    ]
+  },
+  7: {
+    name: "The Enthusiast", tagline: "Spontaneous, versatile, scattered, and distractible",
+    center: "Head / Thinking", fear: "Being deprived, trapped in pain, or missing out", desire: "To be happy, satisfied, and fulfilled",
+    color: "#c4632e",
+    story: "The Seven's story is the story of a child who discovered very early that the antidote to pain was possibility. When something hurt — loss, disappointment, limitation — the mind could escape forward, into what might come next, into plans and adventures and exciting futures that hadn't happened yet. This became a sophisticated emotional strategy: reframe, redirect, keep moving. The Seven's inner world is a dazzling, crowded place — full of ideas, connections, futures, and options. What it struggles to hold is the present, when the present is hard.",
+    room: "A Seven walks into a room and lights up — and the room often lights up with them. They immediately begin connecting threads: that person knows someone interesting, this conversation could go somewhere unexpected, there are at least four good ideas in this room waiting to happen. What looks like pure enthusiasm is also, underneath, a strategy: keep moving, keep engaging, stay ahead of any moment that might turn quiet or heavy. Sevens are genuinely fun to be around — and they work at it harder than they let on.",
+    summary: "Sevens are the escape artists of the Enneagram — but their escape is upward, into possibility. Their strategy is to stay ahead of pain by keeping life full of stimulation and forward momentum. They are genuinely enthusiastic, creative, and generative, and their energy is often infectious. At their best, Sevens are joyful visionaries who make the world feel alive with possibility. The unique gift of the Seven: a real, practiced orientation toward life's abundance that is both rare and genuinely nourishing to be around.",
+    stress: "Type 1 — becomes perfectionistic, critical",
+    growth: "Type 5 — becomes focused, contemplative, present",
+    strengths: ["Energy", "Creativity", "Optimism", "Adaptability", "Idea generation"],
+    challenges: ["Commitment avoidance", "Gluttony for experience", "Shallowness under pressure", "Pain avoidance"],
+    wings: [
+      { label: "7w6", text: "The 6 wing grounds the Seven's enthusiasm with loyalty, relational investment, and a dose of anxiety. These Sevens are more committed — to people, to projects, to communities. They still seek stimulation and possibility, but are less likely to abandon what they've built. They are warmer, more self-aware about their avoidance patterns, and often more genuinely funny because they're willing to engage with their own anxiety." },
+      { label: "7w8", text: "The 8 wing gives the Seven's enthusiasm a harder edge. These Sevens are more assertive, more driven, and more willing to fight for what they want. Less likely to scatter and more likely to commit when something genuinely matters. They can be charismatic and overwhelming in equal measure, and are often entrepreneurial in orientation — they want to build big things fast." }
+    ]
+  },
+  8: {
+    name: "The Challenger", tagline: "Self-confident, decisive, willful, and confrontational",
+    center: "Gut / Body", fear: "Being controlled, harmed, or violated", desire: "To protect themselves and determine their own course",
+    color: "#7a2e2e",
+    story: "The Eight's story is the story of a child who learned, in a world that felt dangerous or unpredictable, that the only reliable protection was strength. They discovered that vulnerability invited harm — so they sealed it off, and built something formidable in its place. Eights often describe an early decision, conscious or not, to never be hurt again — to be the person who acts rather than the person things happen to. This creates enormous capacity for protection, leadership, and impact. It also makes the tenderness beneath the armor one of the most profoundly guarded things in the human experience.",
+    room: "An Eight walks into a room and the room often reorganizes itself around them — not because they demand it, but because their presence is hard to ignore. What's less visible is that Eights are often genuinely surprised to learn people find them intimidating. From the inside, they're just being direct, just making sure the ground is honest. They immediately read the power dynamics — not to dominate, but because knowing the real structure of a room is how they feel safe in it. The armor is real. So is the warmth beneath it, which very few people ever get to see.",
+    summary: "Eights lead with power. They believe the world is a place where only the strong survive — so they made themselves undeniably strong, direct, and impossible to control. This produces remarkable leadership capacity and genuine protectiveness; Eights are often fierce advocates for those they consider under their care. At their best, Eights are heroic, big-hearted protectors who use their power on behalf of others. The unique gift of the Eight: when an Eight decides you are worth protecting, you will feel it.",
+    stress: "Type 5 — withdraws, becomes secretive",
+    growth: "Type 2 — becomes open-hearted, nurturing",
+    strengths: ["Decisiveness", "Confidence", "Leadership", "Protectiveness", "Directness"],
+    challenges: ["Intimidation", "Excessive control", "Vulnerability avoidance", "Aggression", "All-or-nothing thinking"],
+    wings: [
+      { label: "8w7", text: "The 7 wing makes this Eight more extroverted, pleasure-seeking, and entrepreneurially oriented. They combine the Eight's drive and directness with the Seven's love of possibility — they want to build big, move fast, and enjoy the ride. These Eights are often charismatic and magnetically energetic. The vulnerability is still sealed off, but the 7 wing gives them more lightness." },
+      { label: "8w9", text: "The 9 wing gives this Eight a more controlled, patient quality. They still have the Eight's power and decisiveness, but use it more strategically — they can wait, listen, hold space in ways a pure Eight rarely manages. These Eights often appear more approachable and can be profoundly steady in crisis. The stubbornness can be considerable; this combination has enormous willpower and very little interest in being redirected." }
+    ]
+  },
+  9: {
+    name: "The Peacemaker", tagline: "Receptive, reassuring, agreeable, and self-effacing",
+    center: "Gut / Body", fear: "Loss of connection, fragmentation, or conflict", desire: "To have inner stability, peace of mind, and wholeness",
+    color: "#4a6b4a",
+    story: "The Nine's story is the story of the child who discovered that the way to maintain connection was to not want too much. To not make waves. To be easy, agreeable, accommodating — to make themselves small enough that their presence never became a problem. The tragedy embedded in this strategy is that the Nine gradually loses track of what they actually want, feel, and need. Not because they don't have preferences, but because those preferences were habitually set aside for so long that they became hard to hear. The Nine's deepest wound is not feeling unwanted — it's the slow erosion of knowing who they are.",
+    room: "A Nine walks into a room and almost immediately begins to merge with it — to become part of the ambient peace rather than a distinct presence within it. They attune to others with extraordinary sensitivity and often adopt the energy, opinions, and priorities of whoever they're with. This makes them profoundly easy to be around. It also means they can sit in a room full of people and feel entirely invisible — present, but somehow unoccupied in themselves.",
+    summary: "Nines are the great mediators — oriented toward harmony, connection, and the resolution of conflict. Their core strategy is to minimize their own presence and preferences to avoid disruption, giving them a remarkable capacity for empathy and holding multiple perspectives simultaneously. At their best, Nines are peaceful, inclusive, and profoundly stabilizing — the person who can hold space for everyone without taking sides. The unique gift of the Nine: no other type can hold as many perspectives with as much genuine openness and non-judgment.",
+    stress: "Type 6 — becomes anxious, reactive",
+    growth: "Type 3 — becomes focused, self-directed, energized",
+    strengths: ["Equanimity", "Empathy", "Conflict resolution", "Patience", "Inclusive perspective"],
+    challenges: ["Inertia", "Self-forgetting", "Conflict avoidance", "Stubbornness", "Numbing through distraction"],
+    wings: [
+      { label: "9w8", text: "The 8 wing gives the Nine more presence, assertion, and a willingness to push back when pushed. These Nines are still oriented toward peace and harmony, but have access to a directness that pure Nines often lack. They can hold their ground, express anger when genuinely provoked, and bring a quiet but unmistakable strength to their relationships. The tension: long periods of accommodation followed by a sudden, surprising boundary." },
+      { label: "9w1", text: "The 1 wing gives the Nine a more principled, purposeful quality. These Nines still merge and accommodate, but they do it in service of an internalized set of values. They tend to be more self-critical than other Nines, holding themselves to standards they don't always impose on others. They are drawn to roles with ethical dimension and often have a quiet clarity about fairness and principle." }
+    ]
+  }
+};
+
+// ═══════════════════════════════════════
+// SHOW TYPE DETAIL
+// ═══════════════════════════════════════
+function showType(num) {
+  const t = types[num];
+  setSelectedRing(num);
+
+  document.getElementById('detail-number').textContent = num;
+  document.getElementById('detail-eyebrow').textContent = `Type ${num}`;
+  document.getElementById('detail-title').textContent = t.name;
+  document.getElementById('detail-title').style.color = t.color;
+  document.getElementById('detail-tagline').textContent = `"${t.tagline}"`;
+  document.getElementById('detail-header').style.color = t.color;
+  document.getElementById('detail-story').textContent = t.story;
+  document.getElementById('detail-room').textContent = t.room;
+  document.getElementById('detail-summary').textContent = t.summary;
+  document.getElementById('detail-stress').textContent = t.stress;
+  document.getElementById('detail-growth').textContent = t.growth;
+
+  document.getElementById('detail-meta').innerHTML = `
+    <span class="meta-pill" style="background:${t.color}18;color:${t.color}">${t.center}</span>
+    <span class="meta-pill">Fear: ${t.fear}</span>
+    <span class="meta-pill">Desire: ${t.desire}</span>
+  `;
+
+  document.getElementById('detail-strengths').innerHTML =
+    t.strengths.map(x => `<span class="strength-tag">${x}</span>`).join('');
+  document.getElementById('detail-challenges').innerHTML =
+    t.challenges.map(x => `<span class="challenge-tag">${x}</span>`).join('');
+  document.getElementById('detail-wings').innerHTML = t.wings.map(wing => `
+    <div class="wing-card">
+      <div class="wing-label" style="color:${t.color}">${wing.label}</div>
+      <div class="wing-text">${wing.text}</div>
+    </div>
+  `).join('');
+
+  const d = document.getElementById('type-detail');
+  d.classList.add('visible');
+
+  // Remove old animate-card so it re-animates
+  const card = document.getElementById('detail-card');
+  card.classList.remove('animate-card', 'in-view');
+  void card.offsetWidth; // force reflow
+  card.classList.add('animate-card');
+  setTimeout(() => card.classList.add('in-view'), 30);
+
+  setTimeout(() => {
+    d.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 60);
+}
+
+function closeDetail() {
+  document.getElementById('type-detail').classList.remove('visible');
+  setSelectedRing(null);
+}
+
+// ═══════════════════════════════════════
+// FOUNDATION MODALS
+// ═══════════════════════════════════════
+const foundationContent = {
+  centers: {
+    title: "Three Centers of Intelligence",
+    html: `
+      <p>The nine types are organized into three triads, each anchored in a different center of intelligence. Understanding which center a type belongs to is foundational to understanding how that type processes the world.</p>
+      <h3>Gut / Body Center — Types 8, 9, 1</h3>
+      <p>These types lead with instinct, gut reaction, and a drive around autonomy and control. The core emotion of this triad is anger — though each type handles it differently. Type 8 externalizes it, Type 9 numbs it, Type 1 represses and redirects it inward as self-criticism.</p>
+      <h3>Heart / Feeling Center — Types 2, 3, 4</h3>
+      <p>These types lead with emotion, relational attunement, and a drive around identity and image. The core emotion is shame — a question of worth and lovability. Type 2 deflects shame by focusing on others' needs, Type 3 outperforms it, Type 4 turns toward it and explores it deeply.</p>
+      <h3>Head / Thinking Center — Types 5, 6, 7</h3>
+      <p>These types lead with analysis, mental frameworks, and a drive around safety and certainty. The core emotion is fear or anxiety. Type 5 withdraws to manage fear through knowledge, Type 6 scans for threat and seeks external reassurance, Type 7 escapes anxiety through forward motion and positive possibility.</p>
+    `
+  },
+  arrows: {
+    title: "The Arrows",
+    html: `
+      <p>Each type on the Enneagram symbol is connected to two other types by lines. These connections represent how each type shifts under different psychological conditions.</p>
+      <h3>The Stress Arrow</h3>
+      <p>When a type is under significant stress, overwhelmed, or operating from their least healthy patterns, they tend to pick up the lower qualities of their stress-connected type. This isn't a transformation — it's more like a regression.</p>
+      <h3>The Growth Arrow</h3>
+      <p>When a type is psychologically healthy and growing, they naturally begin to embody the strengths of their growth-connected type. This is the direction of development — not becoming a different type, but accessing a wider, healthier range of expression.</p>
+      <p><em>Modern Enneagram thought: both arrows are available in both directions at any time — they are not strictly "stress" and "health" but represent two different sets of qualities each type can lean into.</em></p>
+      <h3>Arrow Map</h3>
+      <table class="arrow-map">
+        <thead><tr><th>Type</th><th>Stress →</th><th>Growth →</th></tr></thead>
+        <tbody>
+          <tr><td>1 — Reformer</td><td>4 (moody, irrational)</td><td>7 (joyful, spontaneous)</td></tr>
+          <tr><td>2 — Helper</td><td>8 (aggressive, controlling)</td><td>4 (self-aware, creative)</td></tr>
+          <tr><td>3 — Achiever</td><td>9 (disengaged, listless)</td><td>6 (cooperative, loyal)</td></tr>
+          <tr><td>4 — Individualist</td><td>2 (clingy, dependent)</td><td>1 (principled, grounded)</td></tr>
+          <tr><td>5 — Investigator</td><td>7 (scattered, impulsive)</td><td>8 (confident, decisive)</td></tr>
+          <tr><td>6 — Loyalist</td><td>3 (competitive, image-driven)</td><td>9 (relaxed, trusting)</td></tr>
+          <tr><td>7 — Enthusiast</td><td>1 (critical, perfectionistic)</td><td>5 (focused, present)</td></tr>
+          <tr><td>8 — Challenger</td><td>5 (withdrawn, secretive)</td><td>2 (open-hearted, nurturing)</td></tr>
+          <tr><td>9 — Peacemaker</td><td>6 (anxious, reactive)</td><td>3 (energized, self-directed)</td></tr>
+        </tbody>
+      </table>
+    `
+  },
+  wings: {
+    title: "Wings",
+    html: `
+      <p>Every type sits between two adjacent types on the Enneagram circle. These adjacent types are called wings, and they flavor the core type — adding texture, nuance, and behavioral variation without changing the fundamental motivation.</p>
+      <p>Most people have a dominant wing (though some are "wing-balanced"), and this wing significantly shapes how a type expresses itself in the world. A 5w4 and a 5w6 are both Type 5s at their core — same fears, same fundamental strategy — but they look and feel quite different in practice.</p>
+      <h3>How to Think About Wings</h3>
+      <p>Wings should be understood as seasoning, not replacement. The core type is always dominant; the wing modifies the expression. Some people feel a clear pull toward one wing; others find themselves balanced between both. Neither is more correct than the other.</p>
+      <p>Wings can also shift across different life periods — a wing that was more dominant in your twenties may quiet as the other becomes more active. The key is that neither wing changes the fundamental core motivation of your type.</p>
+    `
+  }
+};
+
+function openFoundation(key) {
+  const content = foundationContent[key];
+  document.getElementById('modal-title').textContent = content.title;
+  document.getElementById('modal-body').innerHTML = content.html;
+  document.getElementById('foundation-overlay').classList.add('open');
+}
+
+function closeFoundation(e) {
+  if (!e || e.target === document.getElementById('foundation-overlay') || e.currentTarget.tagName === 'BUTTON') {
+    document.getElementById('foundation-overlay').classList.remove('open');
+  }
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeFoundation(); closeDetail(); }
+});
+
+// Init progress bar on load
+document.getElementById('section-progress-fill').style.width = (1 / panels.length * 100) + '%';
+</script>
 </body>
 </html>
