@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Start Here — Lance's Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="content-styles.css">
+    <style>
+        :root { --center-color: #ffd54f; }
+
+        /* Big hero quote */
+        .hero-quote {
+            text-align: center;
+            max-width: 680px;
+            margin: 0 auto 3rem;
+            padding: 2.5rem 2rem;
+            background: rgba(26,58,46,0.4);
+            border: 1px solid rgba(124,179,66,0.25);
+            border-radius: 2rem;
+        }
+
+        .hero-quote-text {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(1.2rem, 4vw, 1.7rem);
+            color: #ffd54f;
+            line-height: 1.6;
+            letter-spacing: 0.04em;
+            margin-bottom: 1rem;
+        }
+
+        .hero-quote-sub {
+            color: rgba(168,230,207,0.6);
+            font-style: italic;
+            font-size: clamp(1rem, 3vw, 1.1rem);
+        }
+
+        /* Step cards */
+        .steps-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .step-card {
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+            background: rgba(26,58,46,0.4);
+            border: 1.5px solid rgba(124,179,66,0.22);
+            border-radius: 1.25rem;
+            padding: 1.75rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .step-card:hover { border-color: rgba(124,179,66,0.45); }
+
+        .step-number {
+            font-family: 'Cinzel', serif;
+            font-size: 2rem;
+            color: rgba(255,213,79,0.35);
+            line-height: 1;
+            flex-shrink: 0;
+            width: 2.5rem;
+            text-align: center;
+            padding-top: 0.1rem;
+        }
+
+        .step-content {}
+
+        .step-title {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(1.1rem, 3.5vw, 1.3rem);
+            color: #ffd54f;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.05em;
+        }
+
+        .step-body {
+            color: #d4f1e3;
+            font-size: clamp(1.05rem, 3vw, 1.15rem);
+            line-height: 1.95;
+        }
+
+        .step-body p { margin-bottom: 0.75rem; }
+        .step-body p:last-child { margin-bottom: 0; }
+        .step-body strong { color: #ffd54f; }
+        .step-body em { color: #a8e6cf; }
+
+        .step-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(124,179,66,0.15);
+            border: 1px solid rgba(124,179,66,0.4);
+            color: #a8e6cf;
+            padding: 0.4rem 0.9rem;
+            border-radius: 2rem;
+            text-decoration: none;
+            font-size: 0.92rem;
+            margin-top: 0.75rem;
+            margin-right: 0.5rem;
+            transition: all 0.25s;
+        }
+
+        .step-link:hover {
+            background: rgba(124,179,66,0.3);
+            color: #d4f1e3;
+        }
+
+        /* Design snapshot */
+        .snapshot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .snapshot-item {
+            background: rgba(13,31,22,0.6);
+            border: 1px solid rgba(124,179,66,0.2);
+            border-radius: 1rem;
+            padding: 1.25rem;
+        }
+
+        .snapshot-label {
+            font-family: 'Cinzel', serif;
+            font-size: 0.72rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: rgba(168,230,207,0.45);
+            margin-bottom: 0.4rem;
+        }
+
+        .snapshot-value {
+            font-size: clamp(1.05rem, 3vw, 1.15rem);
+            color: #ffd54f;
+            line-height: 1.4;
+        }
+
+        .snapshot-sub {
+            font-size: 0.9rem;
+            color: rgba(168,230,207,0.6);
+            margin-top: 0.2rem;
+            font-style: italic;
+        }
+
+        /* Vocab glossary */
+        .vocab-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .vocab-item {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            gap: 1rem;
+            padding: 1rem 1.25rem;
+            background: rgba(13,31,22,0.5);
+            border: 1px solid rgba(124,179,66,0.15);
+            border-radius: 0.75rem;
+            align-items: start;
+        }
+
+        @media (max-width: 500px) {
+            .vocab-item { grid-template-columns: 1fr; }
+        }
+
+        .vocab-term {
+            font-family: 'Cinzel', serif;
+            font-size: 0.9rem;
+            color: #a8e6cf;
+            letter-spacing: 0.06em;
+            padding-top: 0.1rem;
+        }
+
+        .vocab-def {
+            font-size: clamp(1rem, 3vw, 1.05rem);
+            color: rgba(212,241,227,0.8);
+            line-height: 1.8;
+        }
+
+        .section-label {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(1.2rem, 4vw, 1.6rem);
+            color: #a8e6cf;
+            letter-spacing: 0.12em;
+            margin-bottom: 1.25rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="geometric-bg">
+        <div class="geo-layer" id="geo-layer-1"></div>
+        <div class="geo-layer" id="geo-layer-2"></div>
+    </div>
+    <canvas id="fireflies"></canvas>
+
+    <div class="content-container">
+        <a href="index.html" class="back-link">← Back to All Centers</a>
+
+        <div class="content-header">
+            <h2>Start Here</h2>
+        </div>
+
+        <div class="content-section">
+            <div class="section-content">
+
+                <div class="hero-quote">
+                    <div class="hero-quote-text">"You're not broken. You were given the wrong instruction manual."</div>
+                    <div class="hero-quote-sub">Human Design is the correction.</div>
+                </div>
+
+                <h2>What Is This App?</h2>
+                <p>This is a personalized map of your energetic and psychological design — built specifically for you, Lance Baker. It's not a generic overview of Human Design. Every page, every insight, every reframe is written for your specific chart: your gates, your channels, your profile, your defined and undefined centers.</p>
+
+                <p>Think of it as the user manual you should have been given at birth. It explains why you work the way you work — not as a personality type that describes you, but as a blueprint that reveals how your particular energy system is designed to function. The goal isn't to tell you who you are. It's to show you that the things you thought were flaws are actually your design working exactly as intended.</p>
+
+                <h2>Your Design at a Glance</h2>
+
+                <div class="snapshot-grid">
+                    <div class="snapshot-item">
+                        <div class="snapshot-label">Type</div>
+                        <div class="snapshot-value">Manifesting Generator</div>
+                        <div class="snapshot-sub">The multi-passionate engine</div>
+                    </div>
+                    <div class="snapshot-item">
+                        <div class="snapshot-label">Profile</div>
+                        <div class="snapshot-value">3/5</div>
+                        <div class="snapshot-sub">Martyr / Heretic</div>
+                    </div>
+                    <div class="snapshot-item">
+                        <div class="snapshot-label">Strategy</div>
+                        <div class="snapshot-value">To Respond</div>
+                        <div class="snapshot-sub">Wait for your Sacral</div>
+                    </div>
+                    <div class="snapshot-item">
+                        <div class="snapshot-label">Authority</div>
+                        <div class="snapshot-value">Sacral</div>
+                        <div class="snapshot-sub">Your gut is the oracle</div>
+                    </div>
+                    <div class="snapshot-item">
+                        <div class="snapshot-label">Incarnation Cross</div>
+                        <div class="snapshot-value">Sphinx Cross</div>
+                        <div class="snapshot-sub">Gates 13/7 / 1/2</div>
+                    </div>
+                    <div class="snapshot-item">
+                        <div class="snapshot-label">Definition</div>
+                        <div class="snapshot-value">Split</div>
+                        <div class="snapshot-sub">Two separate circuits</div>
+                    </div>
+                    <div class="snapshot-item">
+                        <div class="snapshot-label">Defined Centers</div>
+                        <div class="snapshot-value">Ajna · Throat · G · Sacral · Spleen · Root</div>
+                        <div class="snapshot-sub">6 of 9</div>
+                    </div>
+                    <div class="snapshot-item">
+                        <div class="snapshot-label">Undefined Centers</div>
+                        <div class="snapshot-value">Head · Heart · Solar Plexus</div>
+                        <div class="snapshot-sub">Open amplifiers</div>
+                    </div>
+                </div>
+
+                <h2>Where to Begin</h2>
+
+                <div class="steps-list">
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Read the Sacral Engine first</div>
+                            <div class="step-body">
+                                <p>Your Sacral center is your primary authority and energy source. Everything else in this app makes more sense once you understand how your Sacral works. This is the page that explains the 2am hyperfocus, the burnout cycles, why "just push through" never works, and what aligned energy actually feels like for you.</p>
+                                <a href="center-sacral.html" class="step-link">Sacral Engine →</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Then read the Heart Center</div>
+                            <div class="step-body">
+                                <p>Your undefined Heart is the single biggest source of misdiagnosis in your life. Almost every "I'm lazy / I have no discipline / I can't commit" story traces back to this page. Read it after Sacral so the contrast is clear: what you don't have (willpower), what you do have (Sacral fuel), and why those are completely different engines.</p>
+                                <a href="center-heart.html" class="step-link">Heart Center →</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <div class="step-title">Use the Diagnostic when something feels off</div>
+                            <div class="step-body">
+                                <p>When you're in a hard moment — drained, stuck, reactive, lost — don't try to read the whole app. Go to the diagnostic. Pick your symptoms. It'll tell you exactly which part of your design explains what you're experiencing and what to do about it.</p>
+                                <a href="diagnostic.html" class="step-link">What's Draining Me? →</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <div class="step-title">Explore the Centers in order of what's most relevant</div>
+                            <div class="step-body">
+                                <p>After Sacral and Heart, follow what pulls you. If communication and being misunderstood is a live issue, go to Channel 43-23 and the Throat. If purpose and identity feel murky, go to the G-Center. If you're in a struggle that won't end, Channel 28-38. If your emotions feel like they belong to someone else, Solar Plexus. Follow your curiosity — that's your Sacral leading you to what's most relevant right now.</p>
+                                <a href="index.html" class="step-link">All Centers →</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <div class="step-title">Read the Center Interactions page once you have some context</div>
+                            <div class="step-body">
+                                <p>Once you've read a few individual centers, the Interactions page shows you how they work together. This is where your patterns make the most sense — not as isolated center issues, but as a living circuit interacting with itself. The Split Definition section alone may explain decades of inner conflict.</p>
+                                <a href="interactions.html" class="step-link">Center Interactions →</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h2>Key Concepts to Know</h2>
+
+                <div class="vocab-grid">
+                    <div class="vocab-item">
+                        <div class="vocab-term">Defined Center</div>
+                        <div class="vocab-def">A center that's consistently active in your design. It operates reliably and predictably — this is a stable part of your character. You express these energies outward.</div>
+                    </div>
+                    <div class="vocab-item">
+                        <div class="vocab-term">Undefined Center</div>
+                        <div class="vocab-def">A center that's open — it receives, amplifies, and reflects back the energy of others. You don't consistently generate this energy; you absorb it from the environment. Source of both wisdom and conditioning.</div>
+                    </div>
+                    <div class="vocab-item">
+                        <div class="vocab-term">Sacral Authority</div>
+                        <div class="vocab-def">Your decision-making system is your gut response — the pre-verbal uh-huh / uh-uh that arrives before the mind engages. This is your most reliable oracle for yes/no decisions about concrete, present things.</div>
+                    </div>
+                    <div class="vocab-item">
+                        <div class="vocab-term">Strategy: Respond</div>
+                        <div class="vocab-def">MGs don't initiate well — your Sacral activates in response to stimuli, not from nothing. Waiting for something to respond to isn't passive; it's how you access your real power instead of burning energy initiating the wrong things.</div>
+                    </div>
+                    <div class="vocab-item">
+                        <div class="vocab-term">Profile 3/5</div>
+                        <div class="vocab-def">Line 3 learns through trial and error — "failures" are how you build real wisdom. Line 5 gets projected onto as "the one with answers" — people see expertise in you before you feel it. Together: you experiment publicly, and your experiments become your leadership.</div>
+                    </div>
+                    <div class="vocab-item">
+                        <div class="vocab-term">Split Definition</div>
+                        <div class="vocab-def">Your defined centers form two separate circuits that don't connect internally. This creates a lived sense of being somewhat split — mind-world and body-world operating independently. Certain people bridge your split and create unusual clarity and integration.</div>
+                    </div>
+                    <div class="vocab-item">
+                        <div class="vocab-term">Conditioning</div>
+                        <div class="vocab-def">The patterns you absorbed from family, culture, and education that don't match your design. Undefined centers are the primary sites of conditioning — you absorbed others' energies and mistook them for your own. Most "I should" statements are conditioning.</div>
+                    </div>
+                    <div class="vocab-item">
+                        <div class="vocab-term">Not-Self Theme</div>
+                        <div class="vocab-def">For MGs, the not-self theme is frustration. When you're operating out of alignment — initiating instead of responding, pushing through instead of flowing, doing Sacral-NO things — frustration is the signal. It's not a mood; it's a navigation alert.</div>
+                    </div>
+                    <div class="vocab-item">
+                        <div class="vocab-term">Signature Theme</div>
+                        <div class="vocab-def">For MGs, the signature is satisfaction. When you're in Sacral alignment — responding correctly, doing what your gut said yes to, moving at your natural pace — satisfaction is the felt confirmation that you're living your design.</div>
+                    </div>
+                </div>
+
+                <h2>A Note on How to Use This</h2>
+                <p>This app isn't meant to be read once and understood fully. Human Design is an experiential system — the concepts make the most sense when you're actively testing them against your real life. The best approach: read a page, sit with it for a few days, notice where it shows up. Then come back and read more.</p>
+
+                <p>Some of these reframes will land immediately. Others will take months to embody. That's correct. Your 3 line learns by living, not by studying. This app is the map. Your life is the territory.</p>
+
+                <p>Start with what calls to you. That pull is already your Sacral working.</p>
+
+            </div>
+        </div>
+    </div>
+
+    <footer><p>Wander • Discover • Remember who you are</p></footer>
+    <script src="fireflies.js"></script>
+    <script src="qa-data.js"></script>
+    <script src="qa-widget.js"></script>
+</body>
+</html>

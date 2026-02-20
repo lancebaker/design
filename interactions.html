@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Center Interactions — Lance's Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="content-styles.css">
+    <style>
+        :root { --center-color: #7cb342; }
+
+        .intro-text {
+            text-align: center;
+            max-width: 660px;
+            margin: 0 auto 3rem;
+            color: rgba(168,230,207,0.75);
+            font-size: clamp(1.05rem, 3vw, 1.2rem);
+            font-style: italic;
+            line-height: 1.9;
+        }
+
+        /* Visual circuit map */
+        .circuit-map {
+            position: relative;
+            margin: 0 auto 3rem;
+            max-width: 560px;
+        }
+
+        .circuit-svg {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Interaction cards */
+        .interactions-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .interaction-card {
+            background: rgba(26,58,46,0.45);
+            border: 2px solid rgba(124,179,66,0.25);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .interaction-card:hover {
+            border-color: rgba(124,179,66,0.5);
+        }
+
+        .interaction-header {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .center-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.35rem 0.9rem;
+            border-radius: 2rem;
+            font-size: 0.9rem;
+            font-family: 'Cinzel', serif;
+            letter-spacing: 0.06em;
+            border: 1.5px solid;
+        }
+
+        .center-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .arrow-between {
+            color: rgba(168,230,207,0.4);
+            font-size: 1.2rem;
+            padding: 0 0.25rem;
+        }
+
+        .interaction-title {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(1.1rem, 3.5vw, 1.35rem);
+            color: #ffd54f;
+            letter-spacing: 0.06em;
+            margin-bottom: 0.25rem;
+        }
+
+        .interaction-subtitle {
+            color: rgba(168,230,207,0.55);
+            font-style: italic;
+            font-size: 0.95rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .interaction-body {
+            color: #d4f1e3;
+            font-size: clamp(1.05rem, 3vw, 1.15rem);
+            line-height: 2;
+        }
+
+        .interaction-body p { margin-bottom: 1rem; }
+        .interaction-body p:last-child { margin-bottom: 0; }
+        .interaction-body strong { color: #ffd54f; }
+
+        .pattern-label {
+            display: inline-block;
+            background: rgba(255,213,79,0.1);
+            border: 1px solid rgba(255,213,79,0.3);
+            color: #ffd54f;
+            padding: 0.3rem 0.8rem;
+            border-radius: 0.5rem;
+            font-size: 0.85rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 0.75rem;
+        }
+
+        .read-more-links {
+            margin-top: 1.25rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(124,179,66,0.15);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .read-more-link {
+            display: inline-block;
+            background: rgba(124,179,66,0.12);
+            border: 1px solid rgba(124,179,66,0.35);
+            color: #a8e6cf;
+            padding: 0.4rem 0.9rem;
+            border-radius: 2rem;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.25s;
+        }
+
+        .read-more-link:hover {
+            background: rgba(124,179,66,0.28);
+            color: #d4f1e3;
+        }
+
+        .section-divider {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(1rem, 3vw, 1.3rem);
+            color: #a8e6cf;
+            letter-spacing: 0.18em;
+            text-align: center;
+            margin: 2.5rem 0 1.5rem;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="geometric-bg">
+        <div class="geo-layer" id="geo-layer-1"></div>
+        <div class="geo-layer" id="geo-layer-2"></div>
+    </div>
+    <canvas id="fireflies"></canvas>
+
+    <div class="content-container">
+        <a href="index.html" class="back-link">← Back to All Centers</a>
+
+        <div class="content-header">
+            <h2>How Your Centers Work Together</h2>
+        </div>
+
+        <div class="content-section">
+            <div class="section-content">
+
+                <p class="intro-text">Your design isn't nine separate centers — it's a living circuit. These are the key interactions between your defined centers, and how they shape your most distinctive patterns.</p>
+
+                <!-- Visual circuit map -->
+                <div class="circuit-map">
+                    <svg class="circuit-svg" viewBox="0 0 500 580" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Connection lines -->
+                        <!-- Ajna → Throat (43-23) -->
+                        <line x1="250" y1="130" x2="250" y2="190" stroke="#4caf50" stroke-width="3" stroke-opacity="0.6"/>
+                        <!-- Throat → G-Center (34-10 via Sacral→G) -->
+                        <line x1="250" y1="230" x2="250" y2="290" stroke="#ff9800" stroke-width="2" stroke-opacity="0.4" stroke-dasharray="6 4"/>
+                        <!-- Sacral → G-Center (34-10) -->
+                        <line x1="250" y1="430" x2="250" y2="330" stroke="#ff5722" stroke-width="3" stroke-opacity="0.6"/>
+                        <!-- Sacral → Root (all 3 root gates) -->
+                        <line x1="250" y1="470" x2="250" y2="530" stroke="#ff5722" stroke-width="3" stroke-opacity="0.6"/>
+                        <!-- Spleen → Sacral (28-38) -->
+                        <line x1="160" y1="430" x2="220" y2="450" stroke="#00bcd4" stroke-width="2.5" stroke-opacity="0.5"/>
+
+                        <!-- Undefined centers (faint dashed) -->
+                        <!-- Head to Ajna -->
+                        <line x1="250" y1="50" x2="250" y2="90" stroke="#9c27b0" stroke-width="1.5" stroke-opacity="0.3" stroke-dasharray="4 6"/>
+
+                        <!-- Center nodes -->
+                        <!-- Head (undefined) -->
+                        <circle cx="250" cy="40" r="32" fill="rgba(156,39,176,0.08)" stroke="#9c27b0" stroke-width="1.5" stroke-opacity="0.4" stroke-dasharray="5 5"/>
+                        <text x="250" y="37" text-anchor="middle" fill="#9c27b0" font-family="Cinzel" font-size="8" opacity="0.7">HEAD</text>
+                        <text x="250" y="48" text-anchor="middle" fill="#9c27b0" font-family="Crimson Text" font-size="7" opacity="0.5">undefined</text>
+
+                        <!-- Ajna (defined) -->
+                        <circle cx="250" cy="115" r="32" fill="rgba(76,175,80,0.15)" stroke="#4caf50" stroke-width="2"/>
+                        <circle cx="250" cy="115" r="32" fill="rgba(76,175,80,0.08)"/>
+                        <text x="250" y="112" text-anchor="middle" fill="#4caf50" font-family="Cinzel" font-size="8">AJNA</text>
+                        <text x="250" y="123" text-anchor="middle" fill="#a8e6cf" font-family="Crimson Text" font-size="7" opacity="0.8">defined</text>
+
+                        <!-- Throat (defined) -->
+                        <circle cx="250" cy="210" r="32" fill="rgba(255,152,0,0.15)" stroke="#ff9800" stroke-width="2"/>
+                        <text x="250" y="207" text-anchor="middle" fill="#ff9800" font-family="Cinzel" font-size="8">THROAT</text>
+                        <text x="250" y="218" text-anchor="middle" fill="#a8e6cf" font-family="Crimson Text" font-size="7" opacity="0.8">defined</text>
+
+                        <!-- G-Center (defined) -->
+                        <circle cx="250" cy="308" r="40" fill="rgba(233,30,99,0.15)" stroke="#e91e63" stroke-width="2.5"/>
+                        <text x="250" y="304" text-anchor="middle" fill="#e91e63" font-family="Cinzel" font-size="8">G·CENTER</text>
+                        <text x="250" y="316" text-anchor="middle" fill="#a8e6cf" font-family="Crimson Text" font-size="7" opacity="0.8">defined</text>
+
+                        <!-- Heart (undefined, left) -->
+                        <circle cx="155" cy="308" r="28" fill="rgba(244,67,54,0.06)" stroke="#f44336" stroke-width="1.5" stroke-opacity="0.4" stroke-dasharray="4 5"/>
+                        <text x="155" y="305" text-anchor="middle" fill="#f44336" font-family="Cinzel" font-size="7.5" opacity="0.6">HEART</text>
+                        <text x="155" y="315" text-anchor="middle" fill="#f44336" font-family="Crimson Text" font-size="6.5" opacity="0.45">undefined</text>
+
+                        <!-- Solar Plexus (undefined, right) -->
+                        <circle cx="345" cy="380" r="28" fill="rgba(255,235,59,0.04)" stroke="#ffeb3b" stroke-width="1.5" stroke-opacity="0.35" stroke-dasharray="4 5"/>
+                        <text x="345" y="377" text-anchor="middle" fill="#ffeb3b" font-family="Cinzel" font-size="6.5" opacity="0.55">SOLAR</text>
+                        <text x="345" y="387" text-anchor="middle" fill="#ffeb3b" font-family="Crimson Text" font-size="6" opacity="0.4">undefined</text>
+
+                        <!-- Spleen (defined, left) -->
+                        <circle cx="148" cy="420" r="30" fill="rgba(0,188,212,0.12)" stroke="#00bcd4" stroke-width="2"/>
+                        <text x="148" y="417" text-anchor="middle" fill="#00bcd4" font-family="Cinzel" font-size="7.5">SPLEEN</text>
+                        <text x="148" y="427" text-anchor="middle" fill="#a8e6cf" font-family="Crimson Text" font-size="7" opacity="0.8">defined</text>
+
+                        <!-- Sacral (defined) -->
+                        <circle cx="250" cy="455" r="36" fill="rgba(255,87,34,0.2)" stroke="#ff5722" stroke-width="2.5"/>
+                        <circle cx="250" cy="455" r="36" fill="rgba(255,87,34,0.06)"/>
+                        <text x="250" y="451" text-anchor="middle" fill="#ff5722" font-family="Cinzel" font-size="8">SACRAL</text>
+                        <text x="250" y="462" text-anchor="middle" fill="#a8e6cf" font-family="Crimson Text" font-size="7" opacity="0.8">defined</text>
+
+                        <!-- Root (defined) -->
+                        <circle cx="250" cy="548" r="30" fill="rgba(139,195,74,0.15)" stroke="#8bc34a" stroke-width="2"/>
+                        <text x="250" y="545" text-anchor="middle" fill="#8bc34a" font-family="Cinzel" font-size="7.5">ROOT</text>
+                        <text x="250" y="555" text-anchor="middle" fill="#a8e6cf" font-family="Crimson Text" font-size="7" opacity="0.8">defined</text>
+
+                        <!-- Channel labels -->
+                        <text x="268" y="162" fill="#4caf50" font-family="Crimson Text" font-size="9" opacity="0.8" font-style="italic">43-23</text>
+                        <text x="268" y="395" fill="#ff5722" font-family="Crimson Text" font-size="9" opacity="0.8" font-style="italic">34-10</text>
+                        <text x="268" y="510" fill="#8bc34a" font-family="Crimson Text" font-size="9" opacity="0.8" font-style="italic">root</text>
+                        <text x="168" y="438" fill="#00bcd4" font-family="Crimson Text" font-size="9" opacity="0.8" font-style="italic">28-38</text>
+                    </svg>
+                </div>
+
+                <!-- Defined circuit interactions -->
+                <div class="section-divider">✦ Defined Center Interactions ✦</div>
+
+                <div class="interactions-grid">
+
+                    <div class="interaction-card">
+                        <div class="interaction-header">
+                            <span class="center-pill" style="color:#4caf50; border-color:rgba(76,175,80,0.5)"><span class="center-dot" style="background:#4caf50"></span>Ajna</span>
+                            <span class="arrow-between">⟶</span>
+                            <span class="center-pill" style="color:#ff9800; border-color:rgba(255,152,0,0.5)"><span class="center-dot" style="background:#ff9800"></span>Throat</span>
+                            <span style="font-family:Crimson Text;color:rgba(168,230,207,0.5);font-size:0.9rem;font-style:italic">Channel 43-23</span>
+                        </div>
+                        <div class="interaction-title">The Insight-to-Voice Circuit</div>
+                        <div class="interaction-subtitle">How your breakthroughs become words</div>
+                        <div class="interaction-body">
+                            <p>This is your most distinctive circuit. Gate 43 (Ajna) downloads breakthrough insights — not thoughts you generate, but downloads that <em>arrive</em>. Gate 23 (Throat) is the translator that structures those downloads into language the world can receive.</p>
+                            <p>When this circuit is working correctly, your communication is genuinely original — you're not describing known ideas, you're translating something new into words for the first time. The circuit is also why your best insights often arrive mid-conversation or mid-creation: Gate 23 finalizes the translation through the act of voicing, not before it.</p>
+                            <p><strong>The friction point:</strong> Gate 43 downloads fast. Gate 23 wants to share immediately. But the quality of the landing depends entirely on timing — whether the other person is ready to receive. The circuit is complete inside you. Whether it completes in communication depends on the opening you're given.</p>
+                        </div>
+                        <div class="read-more-links">
+                            <a href="channel-43-23.html" class="read-more-link">Channel 43-23 →</a>
+                            <a href="center-ajna.html" class="read-more-link">Ajna Center →</a>
+                            <a href="center-throat.html" class="read-more-link">Throat Center →</a>
+                        </div>
+                    </div>
+
+                    <div class="interaction-card">
+                        <div class="interaction-header">
+                            <span class="center-pill" style="color:#ff5722; border-color:rgba(255,87,34,0.5)"><span class="center-dot" style="background:#ff5722"></span>Sacral</span>
+                            <span class="arrow-between">⟶</span>
+                            <span class="center-pill" style="color:#e91e63; border-color:rgba(233,30,99,0.5)"><span class="center-dot" style="background:#e91e63"></span>G-Center</span>
+                            <span style="font-family:Crimson Text;color:rgba(168,230,207,0.5);font-size:0.9rem;font-style:italic">Channel 34-10</span>
+                        </div>
+                        <div class="interaction-title">The Power-Identity Circuit</div>
+                        <div class="interaction-subtitle">How alignment becomes character</div>
+                        <div class="interaction-body">
+                            <p>Channel 34-10 directly connects your raw life-force energy (Sacral) to your identity and authentic self (G-Center). This means your sense of who you are isn't separate from what you're doing — it's built through doing what your Sacral says YES to. When you're in Sacral alignment, your G-Center is fully lit. When you're not, your identity feels muddy.</p>
+                            <p>This also means you can't fake authenticity. Gate 10 (Behavior of Self) is about self-love through authentic action. When you're living someone else's YES, Gate 10 can't activate — and you feel hollow, performative, disconnected from yourself even if the work looks impressive to others.</p>
+                            <p><strong>The gift:</strong> You don't need to figure out "who you are" separately from "what you do." They're the same circuit. Follow your Sacral, and your identity clarifies automatically.</p>
+                        </div>
+                        <div class="read-more-links">
+                            <a href="channel-34-10.html" class="read-more-link">Channel 34-10 →</a>
+                            <a href="center-sacral.html" class="read-more-link">Sacral Engine →</a>
+                            <a href="center-identity.html" class="read-more-link">G-Center →</a>
+                        </div>
+                    </div>
+
+                    <div class="interaction-card">
+                        <div class="interaction-header">
+                            <span class="center-pill" style="color:#00bcd4; border-color:rgba(0,188,212,0.5)"><span class="center-dot" style="background:#00bcd4"></span>Spleen</span>
+                            <span class="arrow-between">⟶</span>
+                            <span class="center-pill" style="color:#ff5722; border-color:rgba(255,87,34,0.5)"><span class="center-dot" style="background:#ff5722"></span>Sacral</span>
+                            <span style="font-family:Crimson Text;color:rgba(168,230,207,0.5);font-size:0.9rem;font-style:italic">Channel 28-38</span>
+                        </div>
+                        <div class="interaction-title">The Purpose-Survival Circuit</div>
+                        <div class="interaction-subtitle">How instinct filters what's worth fighting for</div>
+                        <div class="interaction-body">
+                            <p>Channel 28-38 connects your survival and wellbeing intelligence (Spleen) to your raw power (Sacral) through the lens of purpose. Gate 28 asks "does this matter enough to risk?" Gate 38 provides the fighting spirit to sustain the struggle. Together they mean: you have extraordinary capacity to fight for what genuinely matters, and almost no capacity to fight for what doesn't.</p>
+                            <p>This circuit is why you thrive under pressure when the stakes are real — and why routine, low-stakes tasks feel impossible regardless of how simple they are. Your system doesn't just need a Sacral YES. It needs meaning behind the YES.</p>
+                            <p><strong>The integration:</strong> Your Spleen checks survival safety. Your Gate 28 checks purpose. Your Gate 38 provides fuel once both gates are satisfied. All three need to be online for sustained effort to feel natural rather than forced.</p>
+                        </div>
+                        <div class="read-more-links">
+                            <a href="channel-28-38.html" class="read-more-link">Channel 28-38 →</a>
+                            <a href="center-spleen.html" class="read-more-link">Spleen Center →</a>
+                            <a href="center-sacral.html" class="read-more-link">Sacral Engine →</a>
+                        </div>
+                    </div>
+
+                    <div class="interaction-card">
+                        <div class="interaction-header">
+                            <span class="center-pill" style="color:#ff5722; border-color:rgba(255,87,34,0.5)"><span class="center-dot" style="background:#ff5722"></span>Sacral</span>
+                            <span class="arrow-between">⟶</span>
+                            <span class="center-pill" style="color:#8bc34a; border-color:rgba(139,195,74,0.5)"><span class="center-dot" style="background:#8bc34a"></span>Root</span>
+                        </div>
+                        <div class="interaction-title">The Drive-Pressure Circuit</div>
+                        <div class="interaction-subtitle">How urgency becomes momentum</div>
+                        <div class="interaction-body">
+                            <p>Both your Sacral and Root are defined, creating a powerful internal engine of drive and adrenal pressure. Your Root generates constant urgency — a biological pressure to complete and be in motion. Your Sacral provides the fuel and direction for that motion. When they're aligned, the Root's pressure becomes laser-focused momentum. When they're not, Root pressure has nowhere to land and becomes restlessness, anxiety, or that sense of urgency-about-nothing.</p>
+                            <p>Gates 53, 60, and 19 in your Root add specific flavors: Gate 53 initiates new cycles. Gate 60 works within limitation to find breakthroughs. Gate 19 ensures that your pressure is connected to genuine need — yours and others'.</p>
+                            <p><strong>The pattern:</strong> When you feel the restless Root pressure but have nothing to direct it toward, your system is asking "what's my next Sacral YES?" Give it a real target and the restlessness transforms into drive within minutes.</p>
+                        </div>
+                        <div class="read-more-links">
+                            <a href="center-root.html" class="read-more-link">Root Center →</a>
+                            <a href="center-sacral.html" class="read-more-link">Sacral Engine →</a>
+                        </div>
+                    </div>
+
+                    <!-- Split definition section -->
+                    <div class="section-divider">✦ The Split Definition ✦</div>
+
+                    <div class="interaction-card">
+                        <div class="interaction-header">
+                            <span class="center-pill" style="color:#4caf50; border-color:rgba(76,175,80,0.4)"><span class="center-dot" style="background:#4caf50"></span>Ajna–Throat circuit</span>
+                            <span class="arrow-between">↔</span>
+                            <span class="center-pill" style="color:#ff5722; border-color:rgba(255,87,34,0.4)"><span class="center-dot" style="background:#ff5722"></span>Sacral–G–Spleen–Root</span>
+                        </div>
+                        <div class="interaction-title">Two Circuits, One Person</div>
+                        <div class="interaction-subtitle">Why you sometimes feel like two different people</div>
+                        <div class="interaction-body">
+                            <p>You have a Split Definition — your defined centers form two separate circuits that don't directly connect to each other internally. Circuit 1: Ajna → Throat (your mind-to-voice intelligence). Circuit 2: Sacral → G-Center → Spleen → Root (your embodied, purposeful power engine). These two circuits operate somewhat independently.</p>
+                            <p>This creates a real lived experience of internal disconnect: sometimes your mind has a clear insight (Circuit 1 active) but your body has no energy for it (Circuit 2 offline). Other times your Sacral is firing with YES energy (Circuit 2 active) but you can't find the words or mental framework (Circuit 1 lagging). This isn't inconsistency. It's the normal experience of a Split.</p>
+                            <p><strong>The bridge:</strong> Certain people and environments bridge your split — they complete the circuit between your two halves, and you experience unusual clarity, energy, and integration when you're with them. Pay attention to who makes you feel most coherent. They're likely bridging your split. This is why some relationships feel like they "complete" something and others feel draining even if they're perfectly pleasant.</p>
+                            <p><strong>The wisdom:</strong> Your split also means you're less susceptible to groupthink. Because your two circuits need to independently agree, you can't be swept away by either pure emotion or pure logic. Both need to be online for you to move with full power.</p>
+                        </div>
+                        <div class="read-more-links">
+                            <a href="center-ajna.html" class="read-more-link">Ajna Circuit →</a>
+                            <a href="center-sacral.html" class="read-more-link">Sacral Circuit →</a>
+                        </div>
+                    </div>
+
+                    <!-- Undefined centers interaction -->
+                    <div class="section-divider">✦ How Your Undefined Centers Affect the Whole ✦</div>
+
+                    <div class="interaction-card">
+                        <div class="interaction-header">
+                            <span class="center-pill" style="color:#9c27b0; border-color:rgba(156,39,176,0.4)"><span class="center-dot" style="background:#9c27b0"></span>Head</span>
+                            <span class="arrow-between">+</span>
+                            <span class="center-pill" style="color:#f44336; border-color:rgba(244,67,54,0.4)"><span class="center-dot" style="background:#f44336"></span>Heart</span>
+                            <span class="arrow-between">+</span>
+                            <span class="center-pill" style="color:#ffeb3b; border-color:rgba(255,235,59,0.4)"><span class="center-dot" style="background:#ffeb3b"></span>Solar Plexus</span>
+                        </div>
+                        <div class="interaction-title">The Triple Amplifier</div>
+                        <div class="interaction-subtitle">Why you absorb so much from your environment</div>
+                        <div class="interaction-body">
+                            <p>Your three undefined centers — Head, Heart, and Solar Plexus — create a wide-open receiving field. In any environment, you're simultaneously amplifying the mental pressure of the room (Head), the emotional weather of everyone present (Solar Plexus), and the self-worth and motivational energy of those around you (Heart). This makes you extraordinarily sensitive to your environment — and extraordinarily vulnerable to absorbing energy that isn't yours.</p>
+                            <p>The amplification isn't a malfunction. Undefined centers are designed to take in, process, and reflect back what they receive — that's wisdom over time. But in the short term, it means your internal state is significantly shaped by who and what you're around.</p>
+                            <p><strong>The practical implication:</strong> Environment is strategy for you. The people you spend time with, the spaces you work in, the content you consume — all of it is running through three amplifying circuits. Choosing environments carefully isn't preciousness. It's maintenance of your most fundamental navigation systems.</p>
+                        </div>
+                        <div class="read-more-links">
+                            <a href="center-head.html" class="read-more-link">Head Center →</a>
+                            <a href="center-heart.html" class="read-more-link">Heart Center →</a>
+                            <a href="center-solar.html" class="read-more-link">Solar Plexus →</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer><p>Wander • Discover • Remember who you are</p></footer>
+    <script src="fireflies.js"></script>
+    <script src="qa-data.js"></script>
+    <script src="qa-widget.js"></script>
+</body>
+</html>

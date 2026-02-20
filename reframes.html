@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reframes & Mantras — Lance's Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="content-styles.css">
+    <style>
+        :root { --center-color: #a8e6cf; }
+
+        .page-intro {
+            text-align: center;
+            max-width: 620px;
+            margin: 0 auto 2.5rem;
+            color: rgba(168,230,207,0.7);
+            font-size: clamp(1.05rem, 3vw, 1.2rem);
+            font-style: italic;
+            line-height: 1.9;
+        }
+
+        /* Filter tabs */
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            justify-content: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .filter-tab {
+            background: rgba(26,58,46,0.5);
+            border: 1.5px solid rgba(124,179,66,0.3);
+            color: rgba(168,230,207,0.7);
+            font-family: 'Cinzel', serif;
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            padding: 0.45rem 1rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .filter-tab:hover, .filter-tab.active {
+            border-color: #ffd54f;
+            color: #ffd54f;
+            background: rgba(255,213,79,0.08);
+        }
+
+        /* Reframe cards grid */
+        .reframes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .reframe-card {
+            background: rgba(26,58,46,0.45);
+            border: 1.5px solid rgba(124,179,66,0.2);
+            border-radius: 1.25rem;
+            padding: 1.75rem 1.5rem;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            animation: cardFadeIn 0.4s ease forwards;
+        }
+
+        @keyframes cardFadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .reframe-card:hover {
+            border-color: rgba(124,179,66,0.45);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 28px rgba(0,0,0,0.3);
+        }
+
+        .reframe-card.hidden { display: none; }
+
+        .old-story {
+            font-size: clamp(0.9rem, 2.8vw, 0.95rem);
+            color: rgba(212,241,227,0.45);
+            font-style: italic;
+            line-height: 1.7;
+            text-decoration: line-through;
+            text-decoration-color: rgba(244,67,54,0.4);
+        }
+
+        .arrow-down {
+            text-align: center;
+            color: rgba(124,179,66,0.5);
+            font-size: 1.2rem;
+        }
+
+        .new-truth {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(1rem, 3.2vw, 1.15rem);
+            color: #ffd54f;
+            line-height: 1.5;
+            letter-spacing: 0.03em;
+        }
+
+        .reframe-note {
+            font-size: clamp(0.9rem, 2.8vw, 0.98rem);
+            color: rgba(168,230,207,0.65);
+            line-height: 1.75;
+            font-style: italic;
+            border-top: 1px solid rgba(124,179,66,0.15);
+            padding-top: 0.75rem;
+        }
+
+        .tag-pill {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-family: 'Cinzel', serif;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 0.2rem 0.65rem;
+            border-radius: 2rem;
+            border: 1px solid;
+            align-self: flex-start;
+        }
+
+        /* Print styles */
+        @media print {
+            body { background: white; color: #1a1a1a; }
+            .geometric-bg, canvas, .back-link, .filter-bar, footer, #qa-section { display: none !important; }
+            .reframe-card { break-inside: avoid; border: 1px solid #ccc; background: white; }
+            .old-story { color: #999; }
+            .new-truth { color: #1a1a2e; }
+            .reframe-note { color: #555; }
+        }
+
+        .print-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(124,179,66,0.15);
+            border: 2px solid rgba(124,179,66,0.4);
+            color: #a8e6cf;
+            font-family: 'Crimson Text', serif;
+            font-size: 1rem;
+            padding: 0.7rem 1.5rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            margin: 0 auto 2rem;
+            transition: all 0.25s;
+        }
+
+        .print-btn:hover {
+            background: rgba(124,179,66,0.3);
+            color: #d4f1e3;
+        }
+    </style>
+</head>
+<body>
+    <div class="geometric-bg">
+        <div class="geo-layer" id="geo-layer-1"></div>
+        <div class="geo-layer" id="geo-layer-2"></div>
+    </div>
+    <canvas id="fireflies"></canvas>
+
+    <div class="content-container">
+        <a href="index.html" class="back-link">← Back to All Centers</a>
+
+        <div class="content-header">
+            <h2>Reframes & Mantras</h2>
+        </div>
+
+        <div class="content-section">
+            <div class="section-content">
+                <p class="page-intro">The lies you were told about yourself — and the truths your design reveals. These aren't affirmations that contradict reality. They're corrections to a misdiagnosis.</p>
+
+                <button class="print-btn" onclick="window.print()">🖨 Print / Save as PDF</button>
+
+                <div class="filter-bar" id="filter-bar"></div>
+
+                <div class="reframes-grid" id="reframes-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer><p>Wander • Discover • Remember who you are</p></footer>
+    <script src="fireflies.js"></script>
+    <script src="qa-data.js"></script>
+    <script src="qa-widget.js"></script>
+
+    <script>
+    const REFRAMES = [
+        {
+            tag: "Energy",
+            tagColor: "#ff5722",
+            old: "I'm lazy and undisciplined",
+            truth: "I have no willpower by design. My power source is Sacral alignment, not willpower.",
+            note: "Defined Heart people can push through. You can't — and you're not supposed to. Every burnout was misalignment, not moral failure."
+        },
+        {
+            tag: "Energy",
+            tagColor: "#ff5722",
+            old: "I should be consistent like everyone else",
+            truth: "I am consistent — consistently aligned. My Sacral only fuels what it says YES to.",
+            note: "Consistency for a Sacral being means: consistent honoring of your gut, not consistent output regardless of alignment."
+        },
+        {
+            tag: "Energy",
+            tagColor: "#ff5722",
+            old: "I crashed again. I failed.",
+            truth: "My crash is my Sacral enforcing a boundary my mind wouldn't.",
+            note: "The crash is protective intelligence. It's your body saying 'that chapter is complete, or that path was never yours.'"
+        },
+        {
+            tag: "Mind",
+            tagColor: "#9c27b0",
+            old: "I overthink everything and can't stop",
+            truth: "My undefined Head amplifies borrowed pressure. Most of these questions aren't even mine.",
+            note: "Ask: 'Would I be asking this question alone on a quiet morning?' If no — it's not your question."
+        },
+        {
+            tag: "Mind",
+            tagColor: "#9c27b0",
+            old: "I can't make decisions — I second-guess everything",
+            truth: "My Sacral always knows. My mind just hasn't learned to trust it yet.",
+            note: "Drop the question from your head into your body. The gut response arrived before the mental debate started."
+        },
+        {
+            tag: "Mind",
+            tagColor: "#9c27b0",
+            old: "I need to research this more before I'm ready",
+            truth: "My Channel 43-23 insight structures itself through creation, not before it.",
+            note: "The '5w4 needs to master it first' trap. Your deepest knowing arrives mid-making, not in the planning phase."
+        },
+        {
+            tag: "Communication",
+            tagColor: "#ff9800",
+            old: "I'm bad at communication — people never understand me",
+            truth: "I'm ahead of the room. My insights land when the timing is right, not when I explain harder.",
+            note: "Channel 43-23 is breakthrough communication. The problem is rarely the explanation. It's whether the door is open."
+        },
+        {
+            tag: "Communication",
+            tagColor: "#ff9800",
+            old: "I talked too much and made things weird",
+            truth: "I was sharing before being invited. Waiting for the opening isn't withholding — it's strategy.",
+            note: "The same insight lands as a gift through an open door. Through a closed one, even perfect words feel intrusive."
+        },
+        {
+            tag: "Identity",
+            tagColor: "#e91e63",
+            old: "I don't know who I am",
+            truth: "My G-Center knows exactly who I am. I lose that knowing when I live someone else's YES.",
+            note: "Confusion about identity is almost always a signal that Channel 34-10 is offline — you're doing what you should instead of what your Sacral wants."
+        },
+        {
+            tag: "Identity",
+            tagColor: "#e91e63",
+            old: "I'm playing a role instead of living my real life",
+            truth: "When I'm in full Sacral alignment, my Line 5 projection and my actual self become the same person.",
+            note: "The hollow feeling is your INFP Fi detecting inauthenticity. It's a signal to return to your Sacral — not to perform better."
+        },
+        {
+            tag: "Identity",
+            tagColor: "#e91e63",
+            old: "I can't commit to just one thing",
+            truth: "I'm a Manifesting Generator. Multiple passions aren't distraction — they're my design.",
+            note: "The cultural pressure to 'pick one thing' is built for single-definition Generators. You're not broken. You're different architecture."
+        },
+        {
+            tag: "Emotions",
+            tagColor: "#ffeb3b",
+            old: "I'm too sensitive and emotional",
+            truth: "My undefined Solar Plexus is a wisdom antenna. I feel what others can't access.",
+            note: "The sensitivity isn't a weakness. The challenge is learning which feelings are yours and which are the room's amplified signal."
+        },
+        {
+            tag: "Emotions",
+            tagColor: "#ffeb3b",
+            old: "I made a bad decision when I was emotional",
+            truth: "Emotional charge is borrowed energy. My clearest decisions come from Sacral neutrality.",
+            note: "'Sleep on it' is real strategy for your design, not procrastination. Your Sacral in the morning after emotional discharge is your most reliable navigator."
+        },
+        {
+            tag: "Relationships",
+            tagColor: "#00bcd4",
+            old: "I'm draining to be around — I ask too much of people",
+            truth: "I hold others' depths with Gate 13. I deserve the same depth in return.",
+            note: "The Listener needs a witness. Reciprocal depth isn't too much to ask — it's the only kind of connection that actually sustains you."
+        },
+        {
+            tag: "Relationships",
+            tagColor: "#00bcd4",
+            old: "I feel like a fraud — people think I have it together",
+            truth: "My Line 5 projects mastery. I lead from a few steps ahead, not from having fully arrived.",
+            note: "The gap between projection and reality is the 3/5 experience. The experiment is the mastery. You're not behind — you're mid-process, as designed."
+        },
+        {
+            tag: "Purpose",
+            tagColor: "#7cb342",
+            old: "I haven't found my purpose yet",
+            truth: "My purpose isn't a destination. It unfolds through following each Sacral YES.",
+            note: "The Sphinx Cross (13/7/1/2) means your purpose is a way of being — listening, expressing, leading through presence — not a job title to discover."
+        },
+        {
+            tag: "Purpose",
+            tagColor: "#7cb342",
+            old: "I'm in the struggle and it feels pointless",
+            truth: "Channel 28-38 is designed for purposeful struggle. The struggle itself is how I generate meaning.",
+            note: "Gate 28 asks 'is this worth it?' If yes, Gate 38 makes you unstoppable. The question isn't 'how do I stop struggling?' It's 'is this the right struggle?'"
+        },
+        {
+            tag: "Purpose",
+            tagColor: "#7cb342",
+            old: "I keep quitting things before they're done",
+            truth: "My 3 line learns through trial and error. Some completions look like endings — they're actually bridges.",
+            note: "The wisdom your 3 line extracts from 'failed' experiments is the foundation your 5 line leads from. Nothing was wasted."
+        },
+        {
+            tag: "Instinct",
+            tagColor: "#4caf50",
+            old: "I'm being paranoid — there's no logical reason for this feeling",
+            truth: "My Spleen speaks once, without explanation. It's faster than logic because it has to be.",
+            note: "The Spleen's signal doesn't come with a justification document. It says 'not this' and goes quiet. Trust what you can't explain."
+        },
+        {
+            tag: "Instinct",
+            tagColor: "#4caf50",
+            old: "I should just push through and do it anyway",
+            truth: "If my gut says no, 'pushing through' is borrowing against a debt I'll pay in burnout.",
+            note: "There's a difference between resistance (fear-based hesitation) and a Sacral NO. Fear contracts and spins. A NO is quiet, flat, final."
+        },
+    ];
+
+    const TAGS = ['All', ...new Set(REFRAMES.map(r => r.tag))];
+    let activeTag = 'All';
+
+    function renderFilters() {
+        document.getElementById('filter-bar').innerHTML = TAGS.map(t =>
+            `<button class="filter-tab ${t === activeTag ? 'active' : ''}" data-tag="${t}">${t}</button>`
+        ).join('');
+        document.querySelectorAll('.filter-tab').forEach(btn => {
+            btn.addEventListener('click', () => {
+                activeTag = btn.dataset.tag;
+                renderFilters();
+                renderCards();
+            });
+        });
+    }
+
+    function renderCards() {
+        const grid = document.getElementById('reframes-grid');
+        const filtered = activeTag === 'All' ? REFRAMES : REFRAMES.filter(r => r.tag === activeTag);
+        grid.innerHTML = filtered.map((r, i) => `
+            <div class="reframe-card" style="animation-delay:${i * 0.04}s">
+                <span class="tag-pill" style="color:${r.tagColor}; border-color:${r.tagColor}44">${r.tag}</span>
+                <div class="old-story">"${r.old}"</div>
+                <div class="arrow-down">↓</div>
+                <div class="new-truth">${r.truth}</div>
+                <div class="reframe-note">${r.note}</div>
+            </div>
+        `).join('');
+    }
+
+    renderFilters();
+    renderCards();
+    </script>
+</body>
+</html>

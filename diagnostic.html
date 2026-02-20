@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What's Draining Me? — Lance's Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="content-styles.css">
+    <style>
+        :root { --center-color: #a8e6cf; }
+
+        .diag-intro {
+            text-align: center;
+            max-width: 650px;
+            margin: 0 auto 2.5rem;
+            color: rgba(168,230,207,0.75);
+            font-size: clamp(1.05rem, 3vw, 1.2rem);
+            font-style: italic;
+            line-height: 1.9;
+        }
+
+        .symptom-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .symptom-btn {
+            background: rgba(26,58,46,0.5);
+            border: 2px solid rgba(124,179,66,0.25);
+            border-radius: 1rem;
+            padding: 1.1rem 1.25rem;
+            color: #d4f1e3;
+            font-family: 'Crimson Text', serif;
+            font-size: clamp(1rem, 3vw, 1.1rem);
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            line-height: 1.4;
+        }
+
+        .symptom-btn:hover {
+            border-color: rgba(124,179,66,0.6);
+            background: rgba(26,58,46,0.8);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(124,179,66,0.15);
+        }
+
+        .symptom-btn.active {
+            border-color: #ffd54f;
+            background: rgba(255,213,79,0.1);
+            color: #ffd54f;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(255,213,79,0.2);
+        }
+
+        .symptom-icon {
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+
+        /* Results panel */
+        #results-panel {
+            display: none;
+            animation: fadeSlideIn 0.5s ease forwards;
+        }
+
+        #results-panel.visible { display: block; }
+
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-card {
+            background: rgba(26,58,46,0.5);
+            border: 2px solid rgba(124,179,66,0.3);
+            border-radius: 1.25rem;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            animation: fadeSlideIn 0.4s ease forwards;
+        }
+
+        .result-card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(124,179,66,0.2);
+        }
+
+        .result-icon { font-size: 2rem; }
+
+        .result-title {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(1.1rem, 3.5vw, 1.4rem);
+            color: #ffd54f;
+            letter-spacing: 0.05em;
+        }
+
+        .result-center-tag {
+            font-size: 0.8rem;
+            background: rgba(124,179,66,0.2);
+            border: 1px solid rgba(124,179,66,0.4);
+            color: #a8e6cf;
+            padding: 0.2rem 0.7rem;
+            border-radius: 2rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .result-body {
+            color: #d4f1e3;
+            font-size: clamp(1.05rem, 3vw, 1.15rem);
+            line-height: 2;
+        }
+
+        .result-body p { margin-bottom: 1rem; }
+        .result-body p:last-child { margin-bottom: 0; }
+
+        .result-body strong { color: #ffd54f; }
+
+        .result-links {
+            margin-top: 1.25rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(124,179,66,0.15);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .result-link {
+            display: inline-block;
+            background: rgba(124,179,66,0.15);
+            border: 1px solid rgba(124,179,66,0.4);
+            color: #a8e6cf;
+            padding: 0.45rem 1rem;
+            border-radius: 2rem;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: all 0.25s ease;
+        }
+
+        .result-link:hover {
+            background: rgba(124,179,66,0.3);
+            color: #d4f1e3;
+        }
+
+        .clear-btn {
+            display: block;
+            margin: 1rem auto 2rem;
+            background: transparent;
+            border: 2px solid rgba(168,230,207,0.3);
+            color: rgba(168,230,207,0.6);
+            font-family: 'Crimson Text', serif;
+            font-size: 1rem;
+            padding: 0.6rem 1.5rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .clear-btn:hover {
+            border-color: rgba(168,230,207,0.6);
+            color: #d4f1e3;
+        }
+
+        .no-results {
+            text-align: center;
+            color: rgba(168,230,207,0.5);
+            font-style: italic;
+            padding: 2rem;
+        }
+
+        .results-heading {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(1.2rem, 4vw, 1.6rem);
+            color: #a8e6cf;
+            letter-spacing: 0.1em;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .selected-count {
+            text-align: center;
+            color: rgba(168,230,207,0.55);
+            font-style: italic;
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="geometric-bg">
+        <div class="geo-layer" id="geo-layer-1"></div>
+        <div class="geo-layer" id="geo-layer-2"></div>
+    </div>
+    <canvas id="fireflies"></canvas>
+
+    <div class="content-container">
+        <a href="index.html" class="back-link">← Back to All Centers</a>
+
+        <div class="content-header">
+            <h2>What's Draining Me?</h2>
+        </div>
+
+        <div class="content-section">
+            <div class="section-content">
+                <p class="diag-intro">Select everything you're feeling right now. You'll see exactly which part of your design explains it — and what to do about it.</p>
+
+                <div class="symptom-grid" id="symptom-grid"></div>
+
+                <button class="clear-btn" id="clear-btn" style="display:none">✕ Clear all</button>
+
+                <div id="results-panel">
+                    <div class="results-heading">What Your Design Says</div>
+                    <div id="results-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer><p>Wander • Discover • Remember who you are</p></footer>
+    <script src="fireflies.js"></script>
+    <script src="qa-data.js"></script>
+    <script src="qa-widget.js"></script>
+
+    <script>
+    const SYMPTOMS = [
+        {
+            id: 'burnout',
+            icon: '🔥',
+            label: "I'm burned out even though I care about what I'm doing",
+            title: "Sacral–Heart Collision",
+            center: "Sacral + Heart",
+            body: `You care about the work — your Sacral said YES — but you've been trying to sustain it through willpower and discipline instead of alignment. Your undefined Heart has no consistent willpower to draw from. When you push through on "I should," the Sacral energy shuts off even if the project is right.<br><br><strong>The shift:</strong> Check whether you've been responding to genuine Sacral pulls or managing a schedule. Burnout here usually means you've added too many "good idea" commitments on top of your actual Sacral YESes. Something needs to be released.`,
+            links: [{ label: "Sacral Engine", href: "center-sacral.html" }, { label: "Heart Center", href: "center-heart.html" }]
+        },
+        {
+            id: 'motivation',
+            icon: '🪫',
+            label: "I started strong but completely lost motivation",
+            title: "Gate 26 Wave Collapsed",
+            center: "Heart Center",
+            body: `Gate 26 (your only Heart gate) moves in waves. When the wave is up, you feel genuinely capable — driven, clear, ready to commit. When it passes, the energy vanishes completely but the commitment remains. You didn't lose motivation. You lost a borrowed willpower wave and discovered your Sacral wasn't actually behind the commitment.<br><br><strong>The shift:</strong> Before re-engaging with the project, check your Sacral directly — not Gate 26's temporary surge. If your gut says uh-huh, restart from Sacral energy. If it says uh-uh, the project may be complete.`,
+            links: [{ label: "Heart Center", href: "center-heart.html" }, { label: "Sacral Engine", href: "center-sacral.html" }]
+        },
+        {
+            id: 'misunderstood',
+            icon: '💬',
+            label: "I explained something carefully and nobody got it",
+            title: "Timing Before Translation",
+            center: "Channel 43-23",
+            body: `Channel 43-23 downloads breakthrough insights that are genuinely ahead of where others are. The problem isn't your explanation — it's the timing. When you share an insight before others have built the foundation to receive it, no amount of better wording will help. You're not communicating poorly. You're communicating early.<br><br><strong>The shift:</strong> Notice whether you were invited to share or you initiated. MG strategy says wait for "what do you think?" before delivering insights. The same words land completely differently through an open door than through a wall.`,
+            links: [{ label: "Channel 43-23", href: "channel-43-23.html" }, { label: "Throat Center", href: "center-throat.html" }]
+        },
+        {
+            id: 'drained-social',
+            icon: '👥',
+            label: "I feel hollowed out after being around people",
+            title: "Triple Undefined Absorption",
+            center: "Head + Heart + Solar Plexus",
+            body: `In any social environment, you're running three simultaneous absorption processes: your undefined Head picks up and amplifies mental pressure and anxiety from the room; your undefined Heart absorbs others' willpower, self-worth fluctuations, and social competition energy; your undefined Solar Plexus processes and amplifies the entire emotional weather of every person present.<br><br><strong>The shift:</strong> Alone time isn't preference — it's biological necessity. You need solitude to discharge absorbed energy and return to your own signal. The question after being drained isn't "what's wrong with me?" — it's "whose energy am I still carrying?"`,
+            links: [{ label: "Solar Plexus", href: "center-solar.html" }, { label: "Head Center", href: "center-head.html" }, { label: "Heart Center", href: "center-heart.html" }]
+        },
+        {
+            id: 'overthinking',
+            icon: '🌀',
+            label: "My mind won't stop spinning with questions and 'what ifs'",
+            title: "Undefined Head Under Pressure",
+            center: "Head Center",
+            body: `Your undefined Head amplifies the mental pressure of everyone around you and every system you've been exposed to. Those urgent questions — "Am I doing the right thing? What if I'm wrong? Have I thought this through enough?" — are mostly not yours. They're borrowed pressure running through your amplifying circuit.<br><br><strong>The shift:</strong> Ask yourself: "Would I be asking this question if I were completely alone on a quiet morning?" If no, it's probably not your question. Let it pass. Your real guidance system is your Sacral — and it doesn't spin. It just says uh-huh or uh-uh.`,
+            links: [{ label: "Head Center", href: "center-head.html" }, { label: "Sacral Engine", href: "center-sacral.html" }]
+        },
+        {
+            id: 'emotional-reactive',
+            icon: '🌊',
+            label: "I'm emotionally reactive and don't know why",
+            title: "Amplified Emotional Field",
+            center: "Solar Plexus",
+            body: `Your undefined Solar Plexus is a receiving and amplifying station for emotional energy. In an emotionally charged environment — a tense conversation, a crowded space, a loaded relationship — you don't just notice the feeling. You receive it, amplify it, and experience it as if it were fully your own.<br><br><strong>The shift:</strong> When you notice reactive emotions, pause and ask: "Is this mine?" Trace it to a specific cause in your own life. If you can't find one, it's likely environmental. Step out of the field — literally or energetically — before responding to anyone.`,
+            links: [{ label: "Solar Plexus", href: "center-solar.html" }]
+        },
+        {
+            id: 'comparison',
+            icon: '🪞',
+            label: "I keep comparing myself to others and feeling like I'm falling behind",
+            title: "Undefined Heart Conditioning",
+            center: "Heart Center",
+            body: `Your undefined Heart amplifies other people's sense of self-worth, confidence, and achievement. When you're around driven, "successful" people, you don't just observe their momentum — you feel it as amplified pressure against your own perceived lack. The comparison isn't coming from your core; it's coming from your Heart center running someone else's metrics through your system.<br><br><strong>The shift:</strong> Your worth isn't measured in consistency, output, or achievement milestones. It's in alignment. When you're in Sacral flow, you're not behind anyone — you're exactly where your design requires.`,
+            links: [{ label: "Heart Center", href: "center-heart.html" }, { label: "G-Center", href: "center-identity.html" }]
+        },
+        {
+            id: 'imposter',
+            icon: '🎭',
+            label: "I feel like a fraud even when I clearly know something",
+            title: "Line 5 Projection Gap",
+            center: "Profile 3/5",
+            body: `Your Line 5 creates a projection field — people see mastery in you before you feel it yourself. They call you "the expert" while you're still deep in the 3-line experimental phase of figuring things out. The gap between their perception and your inner reality is the imposter feeling. But here's the truth: Channel 43-23 gives you genuine breakthrough insight. Your "not knowing enough yet" is often just the gap between where you are and where Line 5's projection is placing you.<br><br><strong>The shift:</strong> You don't need to close the gap. You lead from a few steps ahead, not from having fully arrived. That's the 3/5 design. The experiment is the mastery.`,
+            links: [{ label: "Channel 43-23", href: "channel-43-23.html" }, { label: "Ajna Center", href: "center-ajna.html" }]
+        },
+        {
+            id: 'restless',
+            icon: '⚡',
+            label: "I feel restless and pressured even when nothing's wrong",
+            title: "Defined Root Urgency",
+            center: "Root Center",
+            body: `Your defined Root center generates a constant low-level urgency — a biological pressure to be in motion, to complete, to move. When you're in Sacral flow, this pressure becomes drive and momentum. When you're not, it becomes restlessness, irritability, and a vague sense of falling behind without a specific reason.<br><br><strong>The shift:</strong> The Root pressure itself isn't a problem. It's asking "what's my next Sacral YES?" Give it a direction and it transforms from anxiety into fuel. Without a real target, it just burns as static.`,
+            links: [{ label: "Root Center", href: "center-root.html" }]
+        },
+        {
+            id: 'cant-start',
+            icon: '🧱',
+            label: "I can't make myself start things even when I want to",
+            title: "Sacral Needs a Stimulus",
+            center: "Sacral + Strategy",
+            body: `MG strategy is to RESPOND — your Sacral doesn't generate momentum from nothing. It needs a stimulus to respond to. If you're staring at a blank page or waiting to "feel ready," you're asking your Sacral to initiate, which isn't how it works. It activates in response to something external.<br><br><strong>The shift:</strong> Create a trigger. Open the file and read the last line. Play a reference track. Text someone about the project. Read one sentence of related material. Give your Sacral something concrete to respond to. The response will come — but it needs a spark first, not a decision.`,
+            links: [{ label: "Sacral Engine", href: "center-sacral.html" }]
+        },
+        {
+            id: 'lost',
+            icon: '🧭',
+            label: "I feel lost about direction and purpose",
+            title: "G-Center Needs Embodiment",
+            center: "G-Center",
+            body: `Your G-Center is defined — you have consistent access to identity and direction. But G-Center guidance doesn't arrive as a thought or a plan. It arrives as a felt sense of "yes, this way" when you're in motion. The Sphinx Cross (Gates 13/7/1/2) means your purpose unfolds through deep listening, authentic expression, and presence — not through figuring it out mentally.<br><br><strong>The shift:</strong> Stop asking "what should I do with my life?" (Head question). Start asking "what does my Sacral say YES to right now?" (Sacral question). Direction for your design is revealed through movement, not through planning.`,
+            links: [{ label: "G-Center", href: "center-identity.html" }, { label: "Sacral Engine", href: "center-sacral.html" }]
+        },
+        {
+            id: 'resentment',
+            icon: '😤',
+            label: "I resent a commitment I made and don't know how to get out",
+            title: "Willpower Commitment",
+            center: "Heart + Sacral",
+            body: `Resentment in your design is almost always a Sacral-NO commitment that was made when Gate 26 was in a wave (you felt temporarily capable) or when you were in someone else's emotional or motivational field. The resentment is the Sacral's delayed invoice — it said no then, and it's still saying no now.<br><br><strong>The shift:</strong> The resentment itself is data, not a character flaw. It's telling you this commitment is costing life force it doesn't have. Wherever possible: renegotiate, reduce scope, or release. Your design can't sustain what your gut vetoed.`,
+            links: [{ label: "Heart Center", href: "center-heart.html" }, { label: "Sacral Engine", href: "center-sacral.html" }]
+        },
+        {
+            id: 'creative-block',
+            icon: '🎨',
+            label: "Creative inspiration has gone quiet",
+            title: "Gate 43 Timing",
+            center: "Channel 43-23",
+            body: `Gate 43 downloads don't follow a schedule. They arrive when they arrive, and they go quiet when they've given what they have. Forcing creative output during a quiet phase depletes your Ajna and produces work that feels hollow to you regardless of how it looks to others.<br><br><strong>The shift:</strong> First, audit inputs — Gate 43 downloads are triggered by encountering new ideas, conversations, experiences. If your input has gone stale, the output will too. Second, check your Sacral — is it a genuine quiet phase (rest is correct) or avoidance of a project it actually wants to engage? The body knows the difference.`,
+            links: [{ label: "Channel 43-23", href: "channel-43-23.html" }, { label: "Ajna Center", href: "center-ajna.html" }]
+        },
+        {
+            id: 'fight',
+            icon: '⚔️',
+            label: "I'm stuck in a struggle that feels pointless but I can't let go",
+            title: "Channel 28-38 Without Purpose",
+            center: "Channel 28-38",
+            body: `Channel 28-38 is the channel of the Fighter — it generates resistance, stubbornness, and fighting spirit. But Gate 28 asks a specific question before Gate 38 commits to the struggle: "Is this worth my life force?" When you're fighting something that doesn't pass Gate 28's test, the energy has nowhere to land. It loops. It drains without producing meaning.<br><br><strong>The shift:</strong> Ask directly: "If I stopped fighting this tomorrow, would my life actually be worse?" If the honest answer is no — or even "I don't know" — your Gate 28 may be trying to release you from a battle that never had enough stakes to justify the cost.`,
+            links: [{ label: "Channel 28-38", href: "channel-28-38.html" }]
+        },
+        {
+            id: 'unseen',
+            icon: '👁️',
+            label: "I feel unseen or deeply misunderstood by people close to me",
+            title: "Gate 13 Without Reciprocity",
+            center: "G-Center / Gate 13",
+            body: `Gate 13 makes you a natural, sacred keeper of other people's stories. You hold space effortlessly. People share with you things they share with no one else. But this same gate can leave you feeling profoundly unseen — because while you're holding everyone else's depths, your own depths rarely get witnessed.<br><br><strong>The shift:</strong> Gate 13 needs reciprocity to stay healthy. The people worth your depth are the ones who ask "what do YOU think?" and actually wait for the answer. You're allowed to only give that kind of depth to people who offer it back. The Listener needs a witness too.`,
+            links: [{ label: "G-Center", href: "center-identity.html" }]
+        },
+        {
+            id: 'instinct',
+            icon: '🦴',
+            label: "Something feels off but I can't logically explain why",
+            title: "Spleen Speaking",
+            center: "Spleen Center",
+            body: `Your defined Spleen is the oldest intelligence in your chart — it operates through instantaneous, in-the-moment survival signals that bypass logic entirely. It speaks once and doesn't repeat. That "something's off" feeling without a rational explanation? That's your Spleen doing exactly its job: flagging a misalignment before your mind has caught up.<br><br><strong>The shift:</strong> Don't override this signal by trying to logic your way out of it. The Spleen doesn't explain itself because it operates faster than explanation. The question isn't "can I justify this feeling?" — it's "what would I do if I trusted it completely?"`,
+            links: [{ label: "Spleen Center", href: "center-spleen.html" }]
+        },
+    ];
+
+    let selected = new Set();
+
+    function render() {
+        const grid = document.getElementById('symptom-grid');
+        grid.innerHTML = SYMPTOMS.map(s => `
+            <button class="symptom-btn ${selected.has(s.id) ? 'active' : ''}" data-id="${s.id}">
+                <span class="symptom-icon">${s.icon}</span>
+                <span>${s.label}</span>
+            </button>
+        `).join('');
+
+        grid.querySelectorAll('.symptom-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.dataset.id;
+                if (selected.has(id)) selected.delete(id);
+                else selected.add(id);
+                render();
+                showResults();
+            });
+        });
+
+        document.getElementById('clear-btn').style.display = selected.size > 0 ? 'block' : 'none';
+    }
+
+    function showResults() {
+        const panel = document.getElementById('results-panel');
+        const list = document.getElementById('results-list');
+
+        if (selected.size === 0) {
+            panel.classList.remove('visible');
+            return;
+        }
+
+        const matches = SYMPTOMS.filter(s => selected.has(s.id));
+
+        list.innerHTML = matches.map(s => `
+            <div class="result-card">
+                <div class="result-card-header">
+                    <span class="result-icon">${s.icon}</span>
+                    <div>
+                        <div class="result-title">${s.title}</div>
+                        <span class="result-center-tag">${s.center}</span>
+                    </div>
+                </div>
+                <div class="result-body"><p>${s.body}</p></div>
+                ${s.links.length ? `<div class="result-links">${s.links.map(l => `<a href="${l.href}" class="result-link">${l.label} →</a>`).join('')}</div>` : ''}
+            </div>
+        `).join('');
+
+        panel.classList.add('visible');
+
+        // Scroll to results smoothly
+        setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+    }
+
+    document.getElementById('clear-btn').addEventListener('click', () => {
+        selected.clear();
+        render();
+        document.getElementById('results-panel').classList.remove('visible');
+    });
+
+    render();
+    </script>
+</body>
+</html>

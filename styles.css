@@ -9,7 +9,8 @@ body {
     background: #0d1f16;
     color: #d4f1e3;
     min-height: 100vh;
-    line-height: 1.6;
+    line-height: 1.7;
+    font-size: clamp(1.05rem, 3.5vw, 1.15rem);
 }
 
 /* Geometric background */
@@ -244,7 +245,7 @@ h1 {
     z-index: 10;
     max-width: 900px;
     margin: 0 auto;
-    padding: 0 1.5rem 3rem;
+    padding: 0 1.25rem 4rem;
 }
 
 .back-link {
@@ -254,10 +255,10 @@ h1 {
     background: rgba(124, 179, 66, 0.2);
     border: 2px solid rgba(124, 179, 66, 0.4);
     color: #a8e6cf;
-    padding: 0.75rem 1.5rem;
+    padding: 0.85rem 1.5rem;
     border-radius: 2rem;
     text-decoration: none;
-    font-size: 1rem;
+    font-size: clamp(1rem, 3.5vw, 1.1rem);
     margin-bottom: 2rem;
     transition: all 0.3s ease;
 }
@@ -278,7 +279,7 @@ h1 {
 
 .content-header h2 {
     font-family: 'Cinzel', serif;
-    font-size: 2.5rem;
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
     color: var(--center-color, #ffd54f);
     margin-bottom: 1rem;
     letter-spacing: 0.1em;
@@ -304,8 +305,8 @@ h1 {
 
 .section-content {
     color: #d4f1e3;
-    font-size: 1.05rem;
-    line-height: 1.9;
+    font-size: clamp(1.1rem, 3.5vw, 1.2rem);
+    line-height: 2;
 }
 
 .section-content p {
